@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import logo from "@/assets/talkswahili-logo.png";
+import { PayoutToasts } from "@/components/PayoutToasts";
 import { people, reviews, withdrawals } from "@/data/people";
 
 const ACTIVATE_URL = "https://adsblog.app/page/reg.php?reg=MrBusiness";
@@ -205,7 +206,21 @@ function Index() {
           {people.map((p, i) => (
             <article key={`${p.name}-${i}`} className="rounded-3xl border border-border bg-card p-4">
               <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary text-2xl">
+                <div className="relative shrink-0">
+                  <img
+                    src={p.avatar}
+                    alt={`Picha ya ${p.name}`}
+                    width={52}
+                    height={52}
+                    loading="lazy"
+                    className="h-13 w-13 rounded-full border border-border object-cover"
+                    style={{ height: 52, width: 52 }}
+                  />
+                  {p.online && (
+                    <span className="absolute bottom-0 left-0 h-3 w-3 rounded-full border-2 border-card bg-success" />
+                  )}
+                </div>
+                <span className="-ml-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-secondary text-[13px] leading-none">
                   {p.flag}
                 </span>
                 <div className="min-w-0 flex-1">
@@ -332,6 +347,8 @@ function Index() {
           Install App
         </button>
       </section>
+
+      <PayoutToasts />
 
       {modal && <ActivateModal title={modal} onClose={() => setModal(null)} />}
     </main>
