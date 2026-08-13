@@ -75,10 +75,10 @@ export const people: Person[] = names.map(([name, country, flag], i) => ({
   name,
   country,
   flag,
-  age: ages[i % ages.length],
-  online: onlinePattern[i % onlinePattern.length],
-  duration: plans[i % plans.length][0],
-  pay: plans[i % plans.length][1],
+  age: ages[i % ages.length]!,
+  online: onlinePattern[i % onlinePattern.length]!,
+  duration: plans[i % plans.length]![0],
+  pay: plans[i % plans.length]![1],
 }));
 
 export const withdrawals = [
