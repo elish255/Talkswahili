@@ -80,6 +80,7 @@ export const people: Person[] = names.map(([name, country, flag], i) => ({
   online: onlinePattern[i % onlinePattern.length]!,
   duration: plans[i % plans.length]![0],
   pay: plans[i % plans.length]![1],
+  avatar: `https://i.pravatar.cc/160?img=${(i % 70) + 1}`,
 }));
 
 export const withdrawals = [
