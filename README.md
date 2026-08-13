@@ -1,14 +1,28 @@
-# Welcome to your Lovable project
+# Your Business Hub
+
+nitengenezee website kama hii https://talkswahili.live/ weka Kila kitu
+
+Sehemu ya activate account weka link hii  https://adsblog.app/page/reg.php?reg=MrBusiness
+
+Sehemu ya customer service 
+
+Sms weka 0743871339
+
+Whatsapp weka 0612820109
+
+Join Chanel toa kabisa hiyo button
 
 This project was built with [Lovable](https://lovable.dev).
 
+**Live app**: https://talkswahil.lovable.app
+
 ## Build with Lovable
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/3d4777ed-e67e-4c4c-a47f-9ef692ad7f08).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
@@ -20,10 +34,3 @@ cd <repository-name>
 npm i
 npm run dev
 ```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
