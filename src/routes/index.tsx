@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import logo from "@/assets/talkswahili-logo.png";
+import { PayoutToasts } from "@/components/PayoutToasts";
 import { people, reviews, withdrawals } from "@/data/people";
 
 const ACTIVATE_URL = "https://adsblog.app/page/reg.php?reg=MrBusiness";
