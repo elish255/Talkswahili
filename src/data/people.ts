@@ -6,6 +6,7 @@ export type Person = {
   online: boolean;
   duration: string;
   pay: string;
+  avatar: string;
 };
 
 const names: Array<[string, string, string]> = [
