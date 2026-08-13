@@ -348,6 +348,8 @@ function Index() {
         </button>
       </section>
 
+      <PayoutToasts />
+
       {modal && <ActivateModal title={modal} onClose={() => setModal(null)} />}
     </main>
   );
