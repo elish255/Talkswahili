@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://talkswahil.lovable.app/sitemap.xml
+Sitemap: https://talkswahilli.live/sitemap.xml
