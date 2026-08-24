@@ -50,6 +50,9 @@ function ChatModal({ person, onClose }: { person: (typeof people)[number]; onClo
   const [completed, setCompleted] = useState(false);
   const [message, setMessage] = useState("");
 
+  // The selected guest is already online when a paid chat starts.
+  // Keep that state fixed for the whole session so the 7-second homepage
+  // rotation cannot incorrectly turn an active guest into "offline".
   const plans = [
     { label: "Dakika 1", price: "TZS 5,000", minutes: 1 },
     { label: "Dakika 20", price: "TZS 30,000", minutes: 20 },
@@ -131,7 +134,10 @@ function ChatModal({ person, onClose }: { person: (typeof people)[number]; onClo
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-lg font-extrabold">{person.name}, {person.age}</p>
-          <p className="text-sm text-muted-foreground">● {person.online ? "Hayupo mtandaoni" : "Hayupo mtandaoni"} • {person.country}</p>
+          <p className="text-sm text-muted-foreground">
+            <span className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-success align-middle" />
+            Mtandaoni • {person.country}
+          </p>
         </div>
         <div className="rounded-full bg-secondary px-4 py-2 text-sm font-extrabold text-gold tabular-nums">
           {String(timerMinutes).padStart(2, "0")}:{String(timerSeconds).padStart(2, "0")}
@@ -142,8 +148,10 @@ function ChatModal({ person, onClose }: { person: (typeof people)[number]; onClo
       </div>
 
       <div className="flex-1 overflow-y-auto p-5">
-        <div className="mx-auto max-w-xl rounded-3xl bg-secondary/40 px-5 py-4 text-center text-sm leading-6 text-muted-foreground">
-          {person.name} hayupo mtandaoni kwa sasa. Hatajibu ujumbe wako na hakuna malipo yatakayotolewa kwa mazungumzo haya.
+        <div className="max-w-[82%] rounded-3xl rounded-tl-md bg-secondary px-5 py-4 text-sm leading-6 text-foreground shadow-sm">
+          {person.name === "Emma"
+            ? "Salamu kutoka huku! Naomba tuanze kwa kujiana kidogo."
+            : `Salamu kutoka ${person.country}! Nimefurahi umeanza chat. Tuanzie kwenye mazungumzo kidogo.`}
         </div>
       </div>
 
@@ -411,8 +419,14 @@ function Index() {
               </div>
               <div className="mt-1.5 grid grid-cols-3 gap-1">
                 <button
-                  onClick={() => setChatPerson(p)}
-                  className="bg-gradient-brand flex h-8 items-center justify-center gap-1 rounded-lg text-[11px] font-bold text-primary-foreground"
+                  onClick={() => {
+                    // Only start a paid chat with a guest who is currently shown
+                    // as online. Pass a fresh snapshot so the homepage rotation
+                    // cannot change the status inside the active chat.
+                    if (p.online) setChatPerson({ ...p, online: true });
+                  }}
+                  disabled={!p.online}
+                  className={`bg-gradient-brand flex h-8 items-center justify-center gap-1 rounded-lg text-[11px] font-bold text-primary-foreground ${!p.online ? "cursor-not-allowed opacity-45" : ""}`}
                 >
                   <MessageCircle className="h-3.5 w-3.5" /> Chat
                 </button>
