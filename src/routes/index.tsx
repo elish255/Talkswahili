@@ -195,15 +195,24 @@ function Index() {
         />
       </section>
 
-      <section className="mt-6">
+      <a
+        href={ACTIVATE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="bg-gradient-gold mt-3 flex h-10 items-center justify-center rounded-xl text-xs font-extrabold text-gold-foreground shadow-glow"
+      >
+        Fungua Account Hapa
+      </a>
+
+      <section className="mt-5">
         <h2 className="text-lg font-extrabold tracking-tight">Wazungu</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Waliopo mtandaoni hujibu chati na malipo hutolewa. Wasiokuwepo hawajibu.
         </p>
 
-        <div className="mt-3 space-y-2">
+        <div className="mt-2 space-y-2">
           {people.map((p, i) => (
-            <article key={`${p.name}-${i}`} className="rounded-2xl border border-border bg-card p-3">
+            <article key={`${p.name}-${i}`} className="rounded-xl border border-border bg-card p-2.5">
               <div className="flex items-center gap-3">
                 <div className="relative shrink-0">
                   <img
@@ -212,8 +221,8 @@ function Index() {
                     width={52}
                     height={52}
                     loading="lazy"
-                    className="h-11 w-11 rounded-full border border-border object-cover"
-                    style={{ height: 44, width: 44 }}
+                    className="h-10 w-10 rounded-full border border-border object-cover"
+                    style={{ height: 40, width: 40 }}
                   />
                   {p.online && (
                     <span className="absolute bottom-0 left-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-success" />
@@ -238,22 +247,22 @@ function Index() {
                   <p className="text-sm font-extrabold text-gold tabular-nums">{p.pay}</p>
                 </div>
               </div>
-              <div className="mt-2 grid grid-cols-3 gap-1.5">
+              <div className="mt-1.5 grid grid-cols-3 gap-1">
                 <button
                   onClick={() => setModal(`Chat na ${p.name}`)}
-                  className="bg-gradient-brand flex h-9 items-center justify-center gap-1 rounded-lg text-xs font-bold text-primary-foreground"
+                  className="bg-gradient-brand flex h-8 items-center justify-center gap-1 rounded-lg text-[11px] font-bold text-primary-foreground"
                 >
                   <MessageCircle className="h-3.5 w-3.5" /> Chat
                 </button>
                 <button
                   onClick={() => setModal(`Voice Call na ${p.name}`)}
-                  className="flex h-9 items-center justify-center gap-1 rounded-lg border border-border bg-secondary text-xs font-bold"
+                  className="flex h-8 items-center justify-center gap-1 rounded-lg border border-border bg-secondary text-[11px] font-bold"
                 >
                   <Phone className="h-3.5 w-3.5" /> Voice Call
                 </button>
                 <button
                   onClick={() => setModal(`Video Call na ${p.name}`)}
-                  className="flex h-9 items-center justify-center gap-1 rounded-lg border border-border bg-secondary text-xs font-bold"
+                  className="flex h-8 items-center justify-center gap-1 rounded-lg border border-border bg-secondary text-[11px] font-bold"
                 >
                   <Video className="h-3.5 w-3.5" /> Video Call
                 </button>
