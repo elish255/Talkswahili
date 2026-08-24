@@ -104,17 +104,17 @@ function StatCard({
   } as const;
   const [border, ...rest] = tones[tone].split(" ");
   return (
-    <div className={`flex min-h-[124px] flex-col justify-between rounded-2xl border p-3 ${border} ${rest[0]}`}>
+    <div className={`flex min-h-[104px] min-w-0 flex-col justify-between rounded-xl border p-2.5 ${border} ${rest[0]}`}>
       <div className="flex items-start justify-between gap-2">
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
-        <span className={`flex h-7 w-7 items-center justify-center rounded-lg bg-secondary ${rest[1]}`}>
+        <p className="min-w-0 text-[10px] font-semibold leading-tight text-muted-foreground sm:text-[11px]">{label}</p>
+        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-secondary ${rest[1]}`}>
           {icon}
         </span>
       </div>
-      <p className="mt-2 text-lg font-extrabold tracking-tight tabular-nums text-foreground sm:text-2xl">
+      <p className="mt-1 text-base font-extrabold tracking-tight tabular-nums text-foreground sm:text-lg">
         {value}
       </p>
-      <div className="mt-2 h-8">
+      <div className="mt-1 min-h-6">
         {action ?? <p className="text-[11px] text-muted-foreground">{hint}</p>}
       </div>
     </div>
@@ -164,7 +164,7 @@ function Index() {
         </a>
       </div>
 
-      <section className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+      <section className="mt-4 grid grid-cols-3 gap-1.5 sm:gap-2">
         <StatCard
           label="Mapato Yote (Net Profit)"
           value="TZS 0"
@@ -180,7 +180,7 @@ function Index() {
           action={
             <button
               onClick={() => setModal("Toa Pesa")}
-              className="bg-gradient-gold h-10 w-full rounded-2xl text-xs font-bold text-gold-foreground"
+              className="bg-gradient-gold h-7 w-full rounded-lg text-[10px] font-bold text-gold-foreground"
             >
               Toa Pesa
             </button>
