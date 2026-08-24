@@ -8,7 +8,7 @@ Sehemu ya customer service
 
 Sms weka 0743871339
 
-Whatsapp weka 0612820109
+Whatsapp Channel: https://whatsapp.com/channel/0029VbCvS6cJZg4EHb909Y0N
 
 Join Chanel toa kabisa hiyo button
 
