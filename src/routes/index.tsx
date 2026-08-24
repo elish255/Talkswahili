@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Headphones,
   MessageCircle,
@@ -43,6 +43,153 @@ export const Route = createFileRoute("/")({
   }),
   component: Index,
 });
+
+function ChatModal({ person, onClose }: { person: (typeof people)[number]; onClose: () => void }) {
+  const [selectedPlan, setSelectedPlan] = useState<{ label: string; price: string; minutes: number } | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(60);
+  const [completed, setCompleted] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const plans = [
+    { label: "Dakika 1", price: "TZS 5,000", minutes: 1 },
+    { label: "Dakika 20", price: "TZS 30,000", minutes: 20 },
+    { label: "Dakika 30", price: "TZS 50,000", minutes: 30 },
+    { label: "Dakika 45", price: "TZS 65,000", minutes: 45 },
+    { label: "Saa moja", price: "TZS 120,000", minutes: 60 },
+    { label: "Masaa mawili", price: "TZS 150,000", minutes: 120 },
+  ];
+
+  useEffect(() => {
+    if (!selectedPlan || completed || secondsLeft <= 0) return;
+    const timer = window.setInterval(() => {
+      setSecondsLeft((current) => Math.max(0, current - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [selectedPlan, completed, secondsLeft]);
+
+  useEffect(() => {
+    if (selectedPlan && secondsLeft === 0) setCompleted(true);
+  }, [selectedPlan, secondsLeft]);
+
+  const choosePlan = (plan: (typeof plans)[number]) => {
+    setSelectedPlan(plan);
+    setSecondsLeft(60);
+    setCompleted(false);
+  };
+
+  const sendMessage = () => {
+    if (!message.trim()) return;
+    setMessage("");
+  };
+
+  const timerMinutes = Math.floor(secondsLeft / 60);
+  const timerSeconds = secondsLeft % 60;
+
+  if (!selectedPlan) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 p-0 sm:items-center sm:p-4">
+        <div className="w-full max-w-xl rounded-t-[2rem] border border-border bg-card p-5 shadow-glow sm:rounded-[2rem]">
+          <div className="flex items-start gap-3">
+            <img src={person.avatar} alt={person.name} className="h-14 w-14 rounded-full border-2 border-primary object-cover" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xl font-extrabold">{person.name}, {person.age}</p>
+              <p className="text-sm text-muted-foreground">{person.country} • {person.online ? "Online" : "Offline"}</p>
+              <p className="mt-1 text-sm text-muted-foreground">Chagua muda unaotaka kuchati na ulipwe</p>
+            </div>
+            <button aria-label="Funga" onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-muted-foreground">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <div className="mt-4 space-y-2">
+            {plans.map((plan) => (
+              <button
+                key={plan.label}
+                onClick={() => choosePlan(plan)}
+                className="flex h-14 w-full items-center justify-between rounded-full border border-border bg-secondary/70 px-5 text-left transition hover:border-primary/50 hover:bg-secondary"
+              >
+                <span className="text-sm font-bold sm:text-base">{plan.label}</span>
+                <span className="text-base font-extrabold text-gold sm:text-lg">{plan.price}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-3 rounded-3xl border border-red-500/40 bg-red-500/5 px-4 py-3 text-center text-xs font-semibold leading-5 text-red-400">
+            ONYO: Ukichat na usimalize muda uliochagua, hulipwi kabisa.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#071923]">
+      <div className="flex items-center gap-3 border-b border-border px-5 py-4 pt-[calc(env(safe-area-inset-top)+12px)]">
+        <div className="relative shrink-0">
+          <img src={person.avatar} alt={person.name} className="h-12 w-12 rounded-full border-2 border-primary object-cover" />
+          <span className="absolute bottom-0 left-0 h-3 w-3 rounded-full border-2 border-[#071923] bg-success" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-lg font-extrabold">{person.name}, {person.age}</p>
+          <p className="text-sm text-muted-foreground">● {person.online ? "Hayupo mtandaoni" : "Hayupo mtandaoni"} • {person.country}</p>
+        </div>
+        <div className="rounded-full bg-secondary px-4 py-2 text-sm font-extrabold text-gold tabular-nums">
+          {String(timerMinutes).padStart(2, "0")}:{String(timerSeconds).padStart(2, "0")}
+        </div>
+        <button aria-label="Funga chat" onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-muted-foreground">
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-5">
+        <div className="mx-auto max-w-xl rounded-3xl bg-secondary/40 px-5 py-4 text-center text-sm leading-6 text-muted-foreground">
+          {person.name} hayupo mtandaoni kwa sasa. Hatajibu ujumbe wako na hakuna malipo yatakayotolewa kwa mazungumzo haya.
+        </div>
+      </div>
+
+      <div className="border-t border-border p-4 pb-[calc(env(safe-area-inset-bottom)+16px)]">
+        <div className="mx-auto flex max-w-xl items-center gap-2">
+          <input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            placeholder="Andika ujumbe wako..."
+            className="min-w-0 flex-1 rounded-full border border-border bg-secondary px-5 py-4 text-sm outline-none placeholder:text-muted-foreground"
+          />
+          <button onClick={sendMessage} className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow">
+            <Send className="h-6 w-6" />
+          </button>
+        </div>
+      </div>
+
+      {completed && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/65 p-5 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-[2rem] border border-border bg-card p-6 text-center shadow-glow sm:p-8">
+            <button aria-label="Funga" onClick={onClose} className="absolute right-8 top-8 hidden h-9 w-9 items-center justify-center rounded-full bg-secondary text-muted-foreground sm:flex">
+              <X className="h-5 w-5" />
+            </button>
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-gold text-4xl">🎉</div>
+            <h2 className="mt-5 text-3xl font-extrabold">Hongera!</h2>
+            <p className="mx-auto mt-3 max-w-md text-base leading-7 text-muted-foreground">
+              Umefanikiwa kumaliza muda wa chat wa <span className="font-extrabold text-primary">{selectedPlan.label}</span> na malipo ya <span className="font-extrabold text-gold">{selectedPlan.price}</span> yameandaliwa. Ili kupokea malipo haya, lazima uwe na akaunti iliyo hai (active account).
+            </p>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+              Akaunti hii itakuwezesha kuingiza malipo yako kwenye namba yako ya simu baada ya kulipwa.
+            </p>
+            <a
+              href={ACTIVATE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gradient-brand mt-5 flex h-14 w-full items-center justify-center rounded-full text-sm font-extrabold text-primary-foreground shadow-glow"
+            >
+              Fungua na Activate Akaunti Hapa
+            </a>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function ActivateModal({ title, onClose }: { title: string; onClose: () => void }) {
   return (
@@ -123,6 +270,21 @@ function StatCard({
 
 function Index() {
   const [modal, setModal] = useState<string | null>(null);
+  const [chatPerson, setChatPerson] = useState<(typeof people)[number] | null>(null);
+  const [livePeople, setLivePeople] = useState(people);
+
+  useEffect(() => {
+    const rotate = () => {
+      const tick = Math.floor(Date.now() / 7000);
+      setLivePeople(people.map((person, index) => ({
+        ...person,
+        online: ((index + tick) % 5) !== 2,
+      })));
+    };
+    rotate();
+    const timer = window.setInterval(rotate, 7000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   return (
     <main className="mx-auto w-full max-w-xl px-3 pb-10 pt-4 sm:px-4">
@@ -211,7 +373,7 @@ function Index() {
         </p>
 
         <div className="mt-2 space-y-2">
-          {people.map((p, i) => (
+          {livePeople.map((p, i) => (
             <article key={`${p.name}-${i}`} className="rounded-xl border border-border bg-card p-2.5">
               <div className="flex items-center gap-3">
                 <div className="relative shrink-0">
@@ -249,7 +411,7 @@ function Index() {
               </div>
               <div className="mt-1.5 grid grid-cols-3 gap-1">
                 <button
-                  onClick={() => setModal(`Chat na ${p.name}`)}
+                  onClick={() => setChatPerson(p)}
                   className="bg-gradient-brand flex h-8 items-center justify-center gap-1 rounded-lg text-[11px] font-bold text-primary-foreground"
                 >
                   <MessageCircle className="h-3.5 w-3.5" /> Chat
@@ -359,6 +521,7 @@ function Index() {
       <PayoutToasts />
 
       {modal && <ActivateModal title={modal} onClose={() => setModal(null)} />}
+      {chatPerson && <ChatModal person={chatPerson} onClose={() => setChatPerson(null)} />}
     </main>
   );
 }
