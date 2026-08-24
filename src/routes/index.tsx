@@ -277,12 +277,14 @@ function Index() {
           >
             <MessageCircle className="h-4 w-4" /> WhatsApp Channel
           </a>
-          <a
-            href={`sms:${SMS_NUMBER}`}
-            className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-secondary text-sm font-bold"
-          >
-            <Send className="h-4 w-4" /> Tuma SMS: {SMS_NUMBER}
-          </a>
+<a
+  href={`sms:${SMS_NUMBER}?body=${encodeURIComponent(
+    "HABARI NINA SWALI KUHUSU TALKSWAHILI, NIELEKEZE"
+  )}`}
+  className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-secondary text-sm font-bold"
+>
+  <Send className="h-4 w-4" /> Tuma SMS: {SMS_NUMBER}
+</a>
         </div>
       </section>
 
