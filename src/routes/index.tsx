@@ -46,20 +46,20 @@ export const Route = createFileRoute("/")({
 
 function ActivateModal({ title, onClose }: { title: string; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 sm:items-center">
-      <div className="w-full max-w-md rounded-3xl border border-border bg-card p-5 shadow-glow">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-3 sm:items-center">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-4 shadow-glow">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/20 text-primary">
-              <ShieldCheck className="h-5 w-5" />
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20 text-primary">
+              <ShieldCheck className="h-4 w-4" />
             </span>
             <h3 className="text-base font-extrabold">{title}</h3>
           </div>
           <button aria-label="Funga" onClick={onClose} className="text-muted-foreground">
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
-        <p className="mt-3 text-sm text-muted-foreground">
+        <p className="mt-2 text-xs text-muted-foreground">
           Akaunti yako haijawashwa (not activated). Bonyeza kitufe hapa chini ili kuwasha akaunti
           yako, kisha urudi kuendelea kuchati na kupokea malipo.
         </p>
@@ -67,13 +67,13 @@ function ActivateModal({ title, onClose }: { title: string; onClose: () => void 
           href={ACTIVATE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-gradient-gold mt-4 flex h-12 items-center justify-center rounded-2xl text-sm font-extrabold text-gold-foreground"
+          className="bg-gradient-gold mt-3 flex h-10 items-center justify-center rounded-xl text-xs font-extrabold text-gold-foreground"
         >
           Activate Account
         </a>
         <button
           onClick={onClose}
-          className="mt-2 h-11 w-full rounded-2xl border border-border bg-secondary text-sm font-semibold"
+          className="mt-2 h-10 w-full rounded-xl border border-border bg-secondary text-sm font-semibold"
         >
           Baadaye
         </button>
@@ -104,17 +104,17 @@ function StatCard({
   } as const;
   const [border, ...rest] = tones[tone].split(" ");
   return (
-    <div className={`flex min-h-[148px] flex-col justify-between rounded-3xl border p-4 ${border} ${rest[0]}`}>
+    <div className={`flex min-h-[124px] flex-col justify-between rounded-2xl border p-3 ${border} ${rest[0]}`}>
       <div className="flex items-start justify-between gap-2">
         <p className="text-xs font-medium text-muted-foreground">{label}</p>
-        <span className={`flex h-8 w-8 items-center justify-center rounded-xl bg-secondary ${rest[1]}`}>
+        <span className={`flex h-7 w-7 items-center justify-center rounded-lg bg-secondary ${rest[1]}`}>
           {icon}
         </span>
       </div>
-      <p className="mt-3 text-xl font-extrabold tracking-tight tabular-nums text-foreground sm:text-2xl">
+      <p className="mt-2 text-lg font-extrabold tracking-tight tabular-nums text-foreground sm:text-2xl">
         {value}
       </p>
-      <div className="mt-3 h-10">
+      <div className="mt-2 h-8">
         {action ?? <p className="text-[11px] text-muted-foreground">{hint}</p>}
       </div>
     </div>
@@ -125,18 +125,18 @@ function Index() {
   const [modal, setModal] = useState<string | null>(null);
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 pb-16 pt-6">
+    <main className="mx-auto w-full max-w-xl px-3 pb-10 pt-4 sm:px-4">
       <header className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <img
             src={logo}
             alt="Talkswahili logo"
             width={44}
             height={44}
-            className="h-11 w-11 rounded-2xl object-contain shadow-glow"
+            className="h-10 w-10 rounded-xl object-contain shadow-glow"
           />
           <div>
-            <h1 className="text-xl font-extrabold tracking-tight">
+            <h1 className="text-lg font-extrabold tracking-tight">
               Talk<span className="text-gradient-brand">swahili</span>
             </h1>
             <p className="text-[11px] text-muted-foreground">Kiswahili ni Fursa</p>
@@ -148,23 +148,23 @@ function Index() {
         </div>
       </header>
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-3 grid grid-cols-2 gap-2">
         <button
           onClick={() => setModal("Install App")}
-          className="bg-gradient-brand flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold text-primary-foreground shadow-glow"
+          className="bg-gradient-brand flex h-10 items-center justify-center gap-1.5 rounded-xl text-xs font-bold text-primary-foreground shadow-glow"
         >
           <img src={logo} alt="" width={24} height={24} className="h-6 w-6 rounded-lg object-contain" />
           Install App
         </button>
         <a
           href="#huduma"
-          className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-secondary text-sm font-bold"
+          className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-border bg-secondary text-xs font-bold"
         >
           <Headphones className="h-4 w-4" /> Customer Care
         </a>
       </div>
 
-      <section className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <section className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
         <StatCard
           label="Mapato Yote (Net Profit)"
           value="TZS 0"
@@ -180,7 +180,7 @@ function Index() {
           action={
             <button
               onClick={() => setModal("Toa Pesa")}
-              className="bg-gradient-gold h-10 w-full rounded-2xl text-sm font-bold text-gold-foreground"
+              className="bg-gradient-gold h-10 w-full rounded-2xl text-xs font-bold text-gold-foreground"
             >
               Toa Pesa
             </button>
@@ -195,15 +195,15 @@ function Index() {
         />
       </section>
 
-      <section className="mt-8">
+      <section className="mt-6">
         <h2 className="text-lg font-extrabold tracking-tight">Wazungu</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Waliopo mtandaoni hujibu chati na malipo hutolewa. Wasiokuwepo hawajibu.
         </p>
 
-        <div className="mt-4 space-y-3">
+        <div className="mt-3 space-y-2">
           {people.map((p, i) => (
-            <article key={`${p.name}-${i}`} className="rounded-3xl border border-border bg-card p-4">
+            <article key={`${p.name}-${i}`} className="rounded-2xl border border-border bg-card p-3">
               <div className="flex items-center gap-3">
                 <div className="relative shrink-0">
                   <img
@@ -212,18 +212,18 @@ function Index() {
                     width={52}
                     height={52}
                     loading="lazy"
-                    className="h-13 w-13 rounded-full border border-border object-cover"
-                    style={{ height: 52, width: 52 }}
+                    className="h-11 w-11 rounded-full border border-border object-cover"
+                    style={{ height: 44, width: 44 }}
                   />
                   {p.online && (
-                    <span className="absolute bottom-0 left-0 h-3 w-3 rounded-full border-2 border-card bg-success" />
+                    <span className="absolute bottom-0 left-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-success" />
                   )}
                 </div>
-                <span className="-ml-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-secondary text-[13px] leading-none">
+                <span className="-ml-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-md bg-secondary text-[13px] leading-none">
                   {p.flag}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold">
+                  <p className="truncate text-xs font-bold">
                     {p.name}, {p.age}
                   </p>
                   <p className="text-[11px] text-muted-foreground">
@@ -238,22 +238,22 @@ function Index() {
                   <p className="text-sm font-extrabold text-gold tabular-nums">{p.pay}</p>
                 </div>
               </div>
-              <div className="mt-3 grid grid-cols-3 gap-2">
+              <div className="mt-2 grid grid-cols-3 gap-1.5">
                 <button
                   onClick={() => setModal(`Chat na ${p.name}`)}
-                  className="bg-gradient-brand flex h-10 items-center justify-center gap-1 rounded-xl text-xs font-bold text-primary-foreground"
+                  className="bg-gradient-brand flex h-9 items-center justify-center gap-1 rounded-lg text-xs font-bold text-primary-foreground"
                 >
                   <MessageCircle className="h-3.5 w-3.5" /> Chat
                 </button>
                 <button
                   onClick={() => setModal(`Voice Call na ${p.name}`)}
-                  className="flex h-10 items-center justify-center gap-1 rounded-xl border border-border bg-secondary text-xs font-bold"
+                  className="flex h-9 items-center justify-center gap-1 rounded-lg border border-border bg-secondary text-xs font-bold"
                 >
                   <Phone className="h-3.5 w-3.5" /> Voice Call
                 </button>
                 <button
                   onClick={() => setModal(`Video Call na ${p.name}`)}
-                  className="flex h-10 items-center justify-center gap-1 rounded-xl border border-border bg-secondary text-xs font-bold"
+                  className="flex h-9 items-center justify-center gap-1 rounded-lg border border-border bg-secondary text-xs font-bold"
                 >
                   <Video className="h-3.5 w-3.5" /> Video Call
                 </button>
@@ -263,34 +263,32 @@ function Index() {
         </div>
       </section>
 
-      <section id="huduma" className="mt-10 rounded-3xl border border-border bg-card p-5">
+      <section id="huduma" className="mt-7 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-lg font-extrabold tracking-tight">Huduma kwa Wateja</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Una swali au changamoto? Wasiliana nasi moja kwa moja.
         </p>
-        <div className="mt-4 space-y-2">
+        <div className="mt-3 space-y-1.5">
           <a
             href={WHATSAPP_CHANNEL_LINK}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-gradient-brand flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold text-primary-foreground"
+            className="bg-gradient-brand flex h-10 items-center justify-center gap-1.5 rounded-xl text-xs font-bold text-primary-foreground"
           >
             <MessageCircle className="h-4 w-4" /> WhatsApp Channel
           </a>
-<a
-  href={`sms:${SMS_NUMBER}?body=${encodeURIComponent(
-    "HABARI NINA SWALI KUHUSU TALKSWAHILI, NIELEKEZE"
-  )}`}
-  className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-secondary text-sm font-bold"
->
-  <Send className="h-4 w-4" /> Tuma SMS: {SMS_NUMBER}
-</a>
+          <a
+            href={`sms:${SMS_NUMBER}?body=${encodeURIComponent("HABARI NINA SWALI KUHUSU TALKSWAHILI, NIELEKEZE")}`}
+            className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-border bg-secondary text-xs font-bold"
+          >
+            <Send className="h-4 w-4" /> Tuma SMS: {SMS_NUMBER}
+          </a>
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-6">
         <h2 className="text-lg font-extrabold tracking-tight">Miamala ya Hivi Karibuni</h2>
-        <div className="mt-3 h-40 overflow-hidden rounded-3xl border border-border bg-card p-4">
+        <div className="mt-3 h-40 overflow-hidden rounded-2xl border border-border bg-card p-3">
           <div className="marquee-up space-y-3">
             {[...withdrawals, ...withdrawals].map((w, i) => (
               <p key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
@@ -302,13 +300,13 @@ function Index() {
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-6">
         <h2 className="text-lg font-extrabold tracking-tight">Rating na Maoni ya Watumiaji</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Maoni halisi kutoka kwa waliolipwa Talkswahili
         </p>
-        <div className="mt-3 flex items-center gap-3 rounded-3xl border border-border bg-card p-4">
-          <p className="text-3xl font-extrabold text-gold">4.7</p>
+        <div className="mt-3 flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
+          <p className="text-2xl font-extrabold text-gold">4.7</p>
           <div>
             <div className="flex gap-0.5 text-gold">
               {[0, 1, 2, 3, 4].map((i) => (
@@ -318,15 +316,15 @@ function Index() {
             <p className="text-[11px] text-muted-foreground">1308+ maoni</p>
           </div>
         </div>
-        <div className="mt-3 space-y-3">
+        <div className="mt-2 space-y-2">
           {reviews.map((r) => (
-            <article key={r.name} className="rounded-3xl border border-border bg-card p-4">
+            <article key={r.name} className="rounded-2xl border border-border bg-card p-3">
               <div className="flex items-center gap-3">
-                <span className="bg-gradient-brand flex h-9 w-9 items-center justify-center rounded-full text-sm font-extrabold text-primary-foreground">
+                <span className="bg-gradient-brand flex h-8 w-8 items-center justify-center rounded-full text-sm font-extrabold text-primary-foreground">
                   {r.name.charAt(0)}
                 </span>
                 <div>
-                  <p className="text-sm font-bold">{r.name}</p>
+                  <p className="text-xs font-bold">{r.name}</p>
                   <p className="text-[11px] text-muted-foreground">{r.city}</p>
                 </div>
               </div>
@@ -336,14 +334,14 @@ function Index() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-3xl border border-primary/30 bg-primary/10 p-5 text-center">
+      <section className="mt-6 rounded-3xl border border-primary/30 bg-primary/10 p-5 text-center">
         <h2 className="text-base font-extrabold">Weka Talkswahili kwenye simu yako</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Gusa hapa chini ili app ijiweke kwenye home screen — kuingia kwa haraka muda wowote.
         </p>
         <button
           onClick={() => setModal("Install App")}
-          className="bg-gradient-brand mt-3 h-12 w-full rounded-2xl text-sm font-bold text-primary-foreground shadow-glow"
+          className="bg-gradient-brand mt-2 h-10 w-full rounded-xl text-xs font-bold text-primary-foreground shadow-glow"
         >
           Install App
         </button>
