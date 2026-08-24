@@ -20,8 +20,7 @@ import { people, reviews, withdrawals } from "@/data/people";
 
 const ACTIVATE_URL = "https://adsblog.app/page/reg.php?reg=MrBusiness";
 const SMS_NUMBER = "0743871339";
-const WHATSAPP_NUMBER = "0612820109";
-const WHATSAPP_LINK = "https://wa.me/255612820109";
+const WHATSAPP_CHANNEL_LINK = "https://whatsapp.com/channel/0029VbCvS6cJZg4EHb909Y0N";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -271,12 +270,12 @@ function Index() {
         </p>
         <div className="mt-4 space-y-2">
           <a
-            href={WHATSAPP_LINK}
+            href={WHATSAPP_CHANNEL_LINK}
             target="_blank"
             rel="noopener noreferrer"
             className="bg-gradient-brand flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold text-primary-foreground"
           >
-            <MessageCircle className="h-4 w-4" /> WhatsApp: {WHATSAPP_NUMBER}
+            <MessageCircle className="h-4 w-4" /> WhatsApp Channel
           </a>
           <a
             href={`sms:${SMS_NUMBER}`}
