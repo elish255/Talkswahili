@@ -183,6 +183,6 @@ main::before {
 
 @media (min-width: 768px) {
   main {
-    max-width: 720px;
+    max-width: 640px;
   }
 }
