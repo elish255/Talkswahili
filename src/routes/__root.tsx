@@ -90,7 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "Chati na wageni waliopo mtandaoni, fuatilia mapato yako na toa pesa haraka.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://www.talkswahililive.site//" },
+      { property: "og:url", content: "https://talkswahilli.live/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -105,7 +105,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
-      { rel: "canonical", href: "https://www.talkswahililive.site//" },
+      { rel: "canonical", href: "https://talkswahilli.live/" },
     ],
   }),
 
