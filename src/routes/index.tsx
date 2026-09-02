@@ -1,11 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { getLocalUser } from "@/lib/local-auth";
+import { useEffect, useState } from "react";
 import {
   Headphones,
   MessageCircle,
   Phone,
+  Send,
   Star,
   TrendingUp,
   Video,
@@ -19,27 +18,24 @@ import logo from "@/assets/talkswahili-logo.png";
 import { PayoutToasts } from "@/components/PayoutToasts";
 import { people, reviews, withdrawals } from "@/data/people";
 
-const WHATSAPP_NUMBER = "0612820109";
-const WHATSAPP_LINK = "https://wa.me/255612820109";
+const ACTIVATE_URL = "https://adsblog.app/page/reg.php?reg=MrBusiness";
+const SMS_NUMBER = "0743871339";
+const WHATSAPP_CHANNEL_LINK = "https://whatsapp.com/channel/0029VbCvS6cJZg4EHb909Y0N";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TALKSWAHILI — Chati na Wageni, Lipwa Papo Hapo" },
+      { title: "Talkswahili — Chati na Wageni, Lipwa Papo Hapo" },
       {
         name: "description",
         content:
-          "TALKSWAHILI ni jukwaa la kuchat na wageni kwa Kiswahili, voice call na video call, kufuatilia mapato na kutoa pesa papo hapo Tanzania.",
+          "Chati, voice call na video call na wageni kwa Kiswahili, fuatilia mapato yako na toa pesa papo hapo kwenye dashibodi ya Talkswahili.",
       },
-      {
-        name: "keywords",
-        content: "TALKSWAHILI, Talkswahili, Talk Swahili, chat na wageni, kuchat na wazungu, lipwa kwa kuchat, kazi online Tanzania, kipato online Tanzania, talkswahililive.site",
-      },
-      { property: "og:title", content: "TALKSWAHILI — Chati na Wageni, Lipwa Papo Hapo" },
+      { property: "og:title", content: "Talkswahili — Chati na Wageni, Lipwa Papo Hapo" },
       {
         property: "og:description",
         content:
-          "TALKSWAHILI — chati na wageni waliopo mtandaoni, pata kipato kwa kuchat, fuatilia balance na tumia huduma za malipo kwa USSD Push.",
+          "Chati na wageni waliopo mtandaoni, fuatilia mapato yako na toa pesa kupitia M-Pesa, Tigo Pesa au Airtel Money.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -48,19 +44,194 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-function ActivateModal({ title, onClose }: { title: string; onClose: () => void }) {
-  const navigate = useNavigate();
-  const isInstall = title === "Install App";
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 sm:items-center">
-      <div className="w-full max-w-md rounded-3xl border border-border bg-card p-5 shadow-glow">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/20 text-primary"><ShieldCheck className="h-5 w-5" /></span><h3 className="text-base font-extrabold">{title}</h3></div>
-          <button aria-label="Funga" onClick={onClose} className="text-muted-foreground"><X className="h-5 w-5" /></button>
+function ChatModal({ person, onClose }: { person: (typeof people)[number]; onClose: () => void }) {
+  const [selectedPlan, setSelectedPlan] = useState<{ label: string; price: string; minutes: number } | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(60);
+  const [completed, setCompleted] = useState(false);
+  const [message, setMessage] = useState("");
+
+  // The selected guest is already online when a paid chat starts.
+  // Keep that state fixed for the whole session so the 7-second homepage
+  // rotation cannot incorrectly turn an active guest into "offline".
+  const plans = [
+    { label: "Dakika 1", price: "TZS 5,000", minutes: 1 },
+    { label: "Dakika 20", price: "TZS 30,000", minutes: 20 },
+    { label: "Dakika 30", price: "TZS 50,000", minutes: 30 },
+    { label: "Dakika 45", price: "TZS 65,000", minutes: 45 },
+    { label: "Saa moja", price: "TZS 120,000", minutes: 60 },
+    { label: "Masaa mawili", price: "TZS 150,000", minutes: 120 },
+  ];
+
+  useEffect(() => {
+    if (!selectedPlan || completed || secondsLeft <= 0) return;
+    const timer = window.setInterval(() => {
+      setSecondsLeft((current) => Math.max(0, current - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [selectedPlan, completed, secondsLeft]);
+
+  useEffect(() => {
+    if (selectedPlan && secondsLeft === 0) setCompleted(true);
+  }, [selectedPlan, secondsLeft]);
+
+  const choosePlan = (plan: (typeof plans)[number]) => {
+    setSelectedPlan(plan);
+    setSecondsLeft(60);
+    setCompleted(false);
+  };
+
+  const sendMessage = () => {
+    if (!message.trim()) return;
+    setMessage("");
+  };
+
+  const timerMinutes = Math.floor(secondsLeft / 60);
+  const timerSeconds = secondsLeft % 60;
+
+  if (!selectedPlan) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 p-0 sm:items-center sm:p-4">
+        <div className="w-full max-w-xl rounded-t-[2rem] border border-border bg-card p-5 shadow-glow sm:rounded-[2rem]">
+          <div className="flex items-start gap-3">
+            <img src={person.avatar} alt={person.name} className="h-14 w-14 rounded-full border-2 border-primary object-cover" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xl font-extrabold">{person.name}, {person.age}</p>
+              <p className="text-sm text-muted-foreground">{person.country} • {person.online ? "Online" : "Offline"}</p>
+              <p className="mt-1 text-sm text-muted-foreground">Chagua muda unaotaka kuchati na ulipwe</p>
+            </div>
+            <button aria-label="Funga" onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-muted-foreground">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <div className="mt-4 space-y-2">
+            {plans.map((plan) => (
+              <button
+                key={plan.label}
+                onClick={() => choosePlan(plan)}
+                className="flex h-14 w-full items-center justify-between rounded-full border border-border bg-secondary/70 px-5 text-left transition hover:border-primary/50 hover:bg-secondary"
+              >
+                <span className="text-sm font-bold sm:text-base">{plan.label}</span>
+                <span className="text-base font-extrabold text-gold sm:text-lg">{plan.price}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-3 rounded-3xl border border-red-500/40 bg-red-500/5 px-4 py-3 text-center text-xs font-semibold leading-5 text-red-400">
+            ONYO: Ukichat na usimalize muda uliochagua, hulipwi kabisa.
+          </div>
         </div>
-        <p className="mt-3 text-sm text-muted-foreground">{isInstall ? "TALKSWAHILI inaweza kuwekwa kwenye home screen ya simu yako kwa matumizi ya haraka." : `${title} inapatikana baada ya akaunti yako kusajiliwa na malipo kuthibitishwa.`}</p>
-        {!isInstall && <button onClick={() => navigate({ to: "/register" })} className="bg-gradient-gold mt-4 flex h-12 w-full items-center justify-center rounded-2xl text-sm font-extrabold text-gold-foreground">Jisajili Sasa</button>}
-        <button onClick={onClose} className="mt-2 h-11 w-full rounded-2xl border border-border bg-secondary text-sm font-semibold">Baadaye</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#071923]">
+      <div className="flex items-center gap-3 border-b border-border px-5 py-4 pt-[calc(env(safe-area-inset-top)+12px)]">
+        <div className="relative shrink-0">
+          <img src={person.avatar} alt={person.name} className="h-12 w-12 rounded-full border-2 border-primary object-cover" />
+          <span className="absolute bottom-0 left-0 h-3 w-3 rounded-full border-2 border-[#071923] bg-success" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-lg font-extrabold">{person.name}, {person.age}</p>
+          <p className="text-sm text-muted-foreground">
+            <span className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-success align-middle" />
+            Mtandaoni • {person.country}
+          </p>
+        </div>
+        <div className="rounded-full bg-secondary px-4 py-2 text-sm font-extrabold text-gold tabular-nums">
+          {String(timerMinutes).padStart(2, "0")}:{String(timerSeconds).padStart(2, "0")}
+        </div>
+        <button aria-label="Funga chat" onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-muted-foreground">
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-5">
+        <div className="max-w-[82%] rounded-3xl rounded-tl-md bg-secondary px-5 py-4 text-sm leading-6 text-foreground shadow-sm">
+          {person.name === "Emma"
+            ? "Salamu kutoka huku! Naomba tuanze kwa kujiana kidogo."
+            : `Salamu kutoka ${person.country}! Nimefurahi umeanza chat. Tuanzie kwenye mazungumzo kidogo.`}
+        </div>
+      </div>
+
+      <div className="border-t border-border p-4 pb-[calc(env(safe-area-inset-bottom)+16px)]">
+        <div className="mx-auto flex max-w-xl items-center gap-2">
+          <input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            placeholder="Andika ujumbe wako..."
+            className="min-w-0 flex-1 rounded-full border border-border bg-secondary px-5 py-4 text-sm outline-none placeholder:text-muted-foreground"
+          />
+          <button onClick={sendMessage} className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow">
+            <Send className="h-6 w-6" />
+          </button>
+        </div>
+      </div>
+
+      {completed && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/65 p-5 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-[2rem] border border-border bg-card p-6 text-center shadow-glow sm:p-8">
+            <button aria-label="Funga" onClick={onClose} className="absolute right-8 top-8 hidden h-9 w-9 items-center justify-center rounded-full bg-secondary text-muted-foreground sm:flex">
+              <X className="h-5 w-5" />
+            </button>
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-gold text-4xl">🎉</div>
+            <h2 className="mt-5 text-3xl font-extrabold">Hongera!</h2>
+            <p className="mx-auto mt-3 max-w-md text-base leading-7 text-muted-foreground">
+              Umefanikiwa kumaliza muda wa chat wa <span className="font-extrabold text-primary">{selectedPlan.label}</span> na malipo ya <span className="font-extrabold text-gold">{selectedPlan.price}</span> yameandaliwa. Ili kupokea malipo haya, lazima uwe na akaunti iliyo hai (active account).
+            </p>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+              Akaunti hii itakuwezesha kuingiza malipo yako kwenye namba yako ya simu baada ya kulipwa.
+            </p>
+            <a
+              href={ACTIVATE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gradient-brand mt-5 flex h-14 w-full items-center justify-center rounded-full text-sm font-extrabold text-primary-foreground shadow-glow"
+            >
+              Fungua na Activate Akaunti Hapa
+            </a>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ActivateModal({ title, onClose }: { title: string; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-3 sm:items-center">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-4 shadow-glow">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20 text-primary">
+              <ShieldCheck className="h-4 w-4" />
+            </span>
+            <h3 className="text-base font-extrabold">{title}</h3>
+          </div>
+          <button aria-label="Funga" onClick={onClose} className="text-muted-foreground">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Akaunti yako haijawashwa (not activated). Bonyeza kitufe hapa chini ili kuwasha akaunti
+          yako, kisha urudi kuendelea kuchati na kupokea malipo.
+        </p>
+        <a
+          href={ACTIVATE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-gradient-gold mt-3 flex h-10 items-center justify-center rounded-xl text-xs font-extrabold text-gold-foreground"
+        >
+          Activate Account
+        </a>
+        <button
+          onClick={onClose}
+          className="mt-2 h-10 w-full rounded-xl border border-border bg-secondary text-sm font-semibold"
+        >
+          Baadaye
+        </button>
       </div>
     </div>
   );
@@ -88,17 +259,17 @@ function StatCard({
   } as const;
   const [border, ...rest] = tones[tone].split(" ");
   return (
-    <div className={`flex min-h-[148px] flex-col justify-between rounded-3xl border p-4 ${border} ${rest[0]}`}>
+    <div className={`flex min-h-[104px] min-w-0 flex-col justify-between rounded-xl border p-2.5 ${border} ${rest[0]}`}>
       <div className="flex items-start justify-between gap-2">
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
-        <span className={`flex h-8 w-8 items-center justify-center rounded-xl bg-secondary ${rest[1]}`}>
+        <p className="min-w-0 text-[10px] font-semibold leading-tight text-muted-foreground sm:text-[11px]">{label}</p>
+        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-secondary ${rest[1]}`}>
           {icon}
         </span>
       </div>
-      <p className="mt-3 text-xl font-extrabold tracking-tight tabular-nums text-foreground sm:text-2xl">
+      <p className="mt-1 text-base font-extrabold tracking-tight tabular-nums text-foreground sm:text-lg">
         {value}
       </p>
-      <div className="mt-3 h-10">
+      <div className="mt-1 min-h-6">
         {action ?? <p className="text-[11px] text-muted-foreground">{hint}</p>}
       </div>
     </div>
@@ -107,23 +278,35 @@ function StatCard({
 
 function Index() {
   const [modal, setModal] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const openChat = (name: string) => { navigate({ to: "/chat", search: { person: name } }); };
-  const registerOrDashboard = () => { const u = getLocalUser(); if (u?.paid) navigate({ to: "/dashboard" }); else navigate({ to: "/register" }); };
+  const [chatPerson, setChatPerson] = useState<(typeof people)[number] | null>(null);
+  const [livePeople, setLivePeople] = useState(people);
+
+  useEffect(() => {
+    const rotate = () => {
+      const tick = Math.floor(Date.now() / 7000);
+      setLivePeople(people.map((person, index) => ({
+        ...person,
+        online: ((index + tick) % 5) !== 2,
+      })));
+    };
+    rotate();
+    const timer = window.setInterval(rotate, 7000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 pb-16 pt-6">
+    <main className="mx-auto w-full max-w-xl px-3 pb-10 pt-4 sm:px-4">
       <header className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <img
             src={logo}
             alt="Talkswahili logo"
             width={44}
             height={44}
-            className="h-11 w-11 rounded-2xl object-contain shadow-glow"
+            className="h-10 w-10 rounded-xl object-contain shadow-glow"
           />
           <div>
-            <h1 className="text-xl font-extrabold tracking-tight">
+            <h1 className="text-lg font-extrabold tracking-tight">
               Talk<span className="text-gradient-brand">swahili</span>
             </h1>
             <p className="text-[11px] text-muted-foreground">Kiswahili ni Fursa</p>
@@ -135,30 +318,23 @@ function Index() {
         </div>
       </header>
 
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <button
-          onClick={registerOrDashboard}
-          className="bg-gradient-gold flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold text-gold-foreground shadow-glow"
-        >
-          Jisajili Sasa
-        </button>
+      <div className="mt-3 grid grid-cols-2 gap-2">
         <button
           onClick={() => setModal("Install App")}
-          className="bg-gradient-brand flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold text-primary-foreground shadow-glow"
+          className="bg-gradient-brand flex h-10 items-center justify-center gap-1.5 rounded-xl text-xs font-bold text-primary-foreground shadow-glow"
         >
           <img src={logo} alt="" width={24} height={24} className="h-6 w-6 rounded-lg object-contain" />
           Install App
         </button>
         <a
           href="#huduma"
-          className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-secondary text-sm font-bold"
+          className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-border bg-secondary text-xs font-bold"
         >
           <Headphones className="h-4 w-4" /> Customer Care
         </a>
-        <button onClick={() => navigate({ to: "/dashboard" })} className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-secondary text-sm font-bold">Dashboard</button>
       </div>
 
-      <section className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <section className="mt-4 grid grid-cols-3 gap-1.5 sm:gap-2">
         <StatCard
           label="Mapato Yote (Net Profit)"
           value="TZS 0"
@@ -174,7 +350,7 @@ function Index() {
           action={
             <button
               onClick={() => setModal("Toa Pesa")}
-              className="bg-gradient-gold h-10 w-full rounded-2xl text-sm font-bold text-gold-foreground"
+              className="bg-gradient-gold h-7 w-full rounded-lg text-[10px] font-bold text-gold-foreground"
             >
               Toa Pesa
             </button>
@@ -189,15 +365,24 @@ function Index() {
         />
       </section>
 
-      <section className="mt-8">
+      <a
+        href={ACTIVATE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="bg-gradient-gold mt-3 flex h-10 items-center justify-center rounded-xl text-xs font-extrabold text-gold-foreground shadow-glow"
+      >
+        Fungua Account Hapa
+      </a>
+
+      <section className="mt-5">
         <h2 className="text-lg font-extrabold tracking-tight">Wazungu</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Waliopo mtandaoni hujibu chati na malipo hutolewa. Wasiokuwepo hawajibu.
         </p>
 
-        <div className="mt-4 space-y-3">
-          {people.map((p, i) => (
-            <article key={`${p.name}-${i}`} className="rounded-3xl border border-border bg-card p-4">
+        <div className="mt-2 space-y-2">
+          {livePeople.map((p, i) => (
+            <article key={`${p.name}-${i}`} className="rounded-xl border border-border bg-card p-2.5">
               <div className="flex items-center gap-3">
                 <div className="relative shrink-0">
                   <img
@@ -206,18 +391,18 @@ function Index() {
                     width={52}
                     height={52}
                     loading="lazy"
-                    className="h-13 w-13 rounded-full border border-border object-cover"
-                    style={{ height: 52, width: 52 }}
+                    className="h-10 w-10 rounded-full border border-border object-cover"
+                    style={{ height: 40, width: 40 }}
                   />
                   {p.online && (
-                    <span className="absolute bottom-0 left-0 h-3 w-3 rounded-full border-2 border-card bg-success" />
+                    <span className="absolute bottom-0 left-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-success" />
                   )}
                 </div>
-                <span className="-ml-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-secondary text-[13px] leading-none">
+                <span className="-ml-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-md bg-secondary text-[13px] leading-none">
                   {p.flag}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold">
+                  <p className="truncate text-xs font-bold">
                     {p.name}, {p.age}
                   </p>
                   <p className="text-[11px] text-muted-foreground">
@@ -232,22 +417,28 @@ function Index() {
                   <p className="text-sm font-extrabold text-gold tabular-nums">{p.pay}</p>
                 </div>
               </div>
-              <div className="mt-3 grid grid-cols-3 gap-2">
+              <div className="mt-1.5 grid grid-cols-3 gap-1">
                 <button
-                  onClick={() => openChat(p.name)}
-                  className="bg-gradient-brand flex h-10 items-center justify-center gap-1 rounded-xl text-xs font-bold text-primary-foreground"
+                  onClick={() => {
+                    // Only start a paid chat with a guest who is currently shown
+                    // as online. Pass a fresh snapshot so the homepage rotation
+                    // cannot change the status inside the active chat.
+                    if (p.online) setChatPerson({ ...p, online: true });
+                  }}
+                  disabled={!p.online}
+                  className={`bg-gradient-brand flex h-8 items-center justify-center gap-1 rounded-lg text-[11px] font-bold text-primary-foreground ${!p.online ? "cursor-not-allowed opacity-45" : ""}`}
                 >
                   <MessageCircle className="h-3.5 w-3.5" /> Chat
                 </button>
                 <button
                   onClick={() => setModal(`Voice Call na ${p.name}`)}
-                  className="flex h-10 items-center justify-center gap-1 rounded-xl border border-border bg-secondary text-xs font-bold"
+                  className="flex h-8 items-center justify-center gap-1 rounded-lg border border-border bg-secondary text-[11px] font-bold"
                 >
                   <Phone className="h-3.5 w-3.5" /> Voice Call
                 </button>
                 <button
                   onClick={() => setModal(`Video Call na ${p.name}`)}
-                  className="flex h-10 items-center justify-center gap-1 rounded-xl border border-border bg-secondary text-xs font-bold"
+                  className="flex h-8 items-center justify-center gap-1 rounded-lg border border-border bg-secondary text-[11px] font-bold"
                 >
                   <Video className="h-3.5 w-3.5" /> Video Call
                 </button>
@@ -257,26 +448,32 @@ function Index() {
         </div>
       </section>
 
-      <section id="huduma" className="mt-10 rounded-3xl border border-border bg-card p-5">
+      <section id="huduma" className="mt-7 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-lg font-extrabold tracking-tight">Huduma kwa Wateja</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Una swali au changamoto? Wasiliana nasi moja kwa moja.
         </p>
-        <div className="mt-4 space-y-2">
+        <div className="mt-3 space-y-1.5">
           <a
-            href={WHATSAPP_LINK}
+            href={WHATSAPP_CHANNEL_LINK}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-gradient-brand flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold text-primary-foreground"
+            className="bg-gradient-brand flex h-10 items-center justify-center gap-1.5 rounded-xl text-xs font-bold text-primary-foreground"
           >
-            <MessageCircle className="h-4 w-4" /> WhatsApp: {WHATSAPP_NUMBER}
+            <MessageCircle className="h-4 w-4" /> WhatsApp Channel
+          </a>
+          <a
+            href={`sms:${SMS_NUMBER}?body=${encodeURIComponent("HABARI NINA SWALI KUHUSU TALKSWAHILI, NIELEKEZE")}`}
+            className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-border bg-secondary text-xs font-bold"
+          >
+            <Send className="h-4 w-4" /> Tuma SMS: {SMS_NUMBER}
           </a>
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-6">
         <h2 className="text-lg font-extrabold tracking-tight">Miamala ya Hivi Karibuni</h2>
-        <div className="mt-3 h-40 overflow-hidden rounded-3xl border border-border bg-card p-4">
+        <div className="mt-3 h-40 overflow-hidden rounded-2xl border border-border bg-card p-3">
           <div className="marquee-up space-y-3">
             {[...withdrawals, ...withdrawals].map((w, i) => (
               <p key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
@@ -288,13 +485,13 @@ function Index() {
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-6">
         <h2 className="text-lg font-extrabold tracking-tight">Rating na Maoni ya Watumiaji</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Maoni halisi kutoka kwa waliolipwa Talkswahili
         </p>
-        <div className="mt-3 flex items-center gap-3 rounded-3xl border border-border bg-card p-4">
-          <p className="text-3xl font-extrabold text-gold">4.7</p>
+        <div className="mt-3 flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
+          <p className="text-2xl font-extrabold text-gold">4.7</p>
           <div>
             <div className="flex gap-0.5 text-gold">
               {[0, 1, 2, 3, 4].map((i) => (
@@ -304,15 +501,15 @@ function Index() {
             <p className="text-[11px] text-muted-foreground">1308+ maoni</p>
           </div>
         </div>
-        <div className="mt-3 space-y-3">
+        <div className="mt-2 space-y-2">
           {reviews.map((r) => (
-            <article key={r.name} className="rounded-3xl border border-border bg-card p-4">
+            <article key={r.name} className="rounded-2xl border border-border bg-card p-3">
               <div className="flex items-center gap-3">
-                <span className="bg-gradient-brand flex h-9 w-9 items-center justify-center rounded-full text-sm font-extrabold text-primary-foreground">
+                <span className="bg-gradient-brand flex h-8 w-8 items-center justify-center rounded-full text-sm font-extrabold text-primary-foreground">
                   {r.name.charAt(0)}
                 </span>
                 <div>
-                  <p className="text-sm font-bold">{r.name}</p>
+                  <p className="text-xs font-bold">{r.name}</p>
                   <p className="text-[11px] text-muted-foreground">{r.city}</p>
                 </div>
               </div>
@@ -322,14 +519,14 @@ function Index() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-3xl border border-primary/30 bg-primary/10 p-5 text-center">
+      <section className="mt-6 rounded-3xl border border-primary/30 bg-primary/10 p-5 text-center">
         <h2 className="text-base font-extrabold">Weka Talkswahili kwenye simu yako</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Gusa hapa chini ili app ijiweke kwenye home screen — kuingia kwa haraka muda wowote.
         </p>
         <button
           onClick={() => setModal("Install App")}
-          className="bg-gradient-brand mt-3 h-12 w-full rounded-2xl text-sm font-bold text-primary-foreground shadow-glow"
+          className="bg-gradient-brand mt-2 h-10 w-full rounded-xl text-xs font-bold text-primary-foreground shadow-glow"
         >
           Install App
         </button>
@@ -338,6 +535,7 @@ function Index() {
       <PayoutToasts />
 
       {modal && <ActivateModal title={modal} onClose={() => setModal(null)} />}
+      {chatPerson && <ChatModal person={chatPerson} onClose={() => setChatPerson(null)} />}
     </main>
   );
 }
