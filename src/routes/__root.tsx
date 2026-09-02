@@ -77,21 +77,33 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#0b1620" },
-      { title: "Talkswahili — Chati na Wageni, Lipwa Papo Hapo" },
+      { name: "theme-color", content: "#5106a0" },
+      { title: "TALKSWAHILI — Chati na Wageni, Lipwa Papo Hapo" },
       {
         name: "description",
         content:
-          "Talkswahili ni dashibodi ya kuchati, voice call na video call na wageni kwa Kiswahili na kupokea malipo papo hapo.",
+          "TALKSWAHILI ni dashibodi ya kuchati, voice call na video call na wageni kwa Kiswahili na kupokea malipo papo hapo.",
       },
-      { property: "og:title", content: "Talkswahili — Chati na Wageni, Lipwa Papo Hapo" },
+      {
+        name: "keywords",
+        content:
+          "TALKSWAHILI, Talkswahili, Talk Swahili, talkswahililive.site, Kiswahili ni Fursa, chat na wageni, kuchat na wazungu, lipwa kwa kuchat, kazi online Tanzania, kipato online Tanzania, online chat jobs Tanzania, foreign chat Tanzania, chat Tanzania, voice call, video call, USSD Push, Mobilipa",
+      },
+      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+      { name: "googlebot", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+      { property: "og:title", content: "TALKSWAHILI — Chati na Wageni, Lipwa Papo Hapo" },
       {
         property: "og:description",
         content: "Chati na wageni waliopo mtandaoni, fuatilia mapato yako na toa pesa haraka.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://talkswahili.live/" },
+      { property: "og:image", content: "https://talkswahililive.site/favicon.png" },
+      { property: "og:url", content: "https://talkswahililive.site/" },
+      { property: "og:site_name", content: "TALKSWAHILI" },
+      { property: "og:locale", content: "sw_TZ" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "TALKSWAHILI — Chati na Wageni, Lipwa Papo Hapo" },
+      { name: "twitter:description", content: "TALKSWAHILI ni jukwaa la kuchat na wageni, kupata kipato kwa kuchat na kufuatilia balance yako." },
     ],
     links: [
       {
@@ -105,7 +117,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
-      { rel: "canonical", href: "https://talkswahili.live/" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "canonical", href: "https://talkswahililive.site/" },
     ],
   }),
 
