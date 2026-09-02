@@ -1,24 +1,115 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, Send, X } from "lucide-react";
 import { getLocalUser, updateLocalUser, formatTzs } from "@/lib/local-auth";
 import { people } from "@/data/people";
 
-export const Route = createFileRoute("/chat")({ validateSearch: (s: Record<string, unknown>) => ({ person: typeof s.person === "string" ? s.person : "Emma" }), head: () => ({ meta: [{ title: "Chat — TALKSWAHILI" }] }), component: ChatPage });
+export const Route = createFileRoute("/chat")({
+  validateSearch: (s: Record<string, unknown>) => ({ person: typeof s.person === "string" ? s.person : "Emma" }),
+  head: () => ({ meta: [{ title: "Chat — TALKSWAHILI" }] }),
+  component: ChatPage,
+});
+
 type Msg = { id: string; from: "user" | "foreigner"; text: string; time: string };
 const KEY = "talkswahili_chat_";
 
 function ChatPage() {
-  const navigate = useNavigate(); const { person: personName } = Route.useSearch();
+  const navigate = useNavigate();
+  const { person: personName } = Route.useSearch();
   const person = useMemo(() => people.find(p => p.name === personName) ?? people[0], [personName]);
-  const [text, setText] = useState(""); const [messages, setMessages] = useState<Msg[]>([]); const [gate, setGate] = useState(false);
-  useEffect(() => { try { const raw = localStorage.getItem(KEY + person.name); if (raw) setMessages(JSON.parse(raw)); else setMessages([{ id: "welcome", from: "foreigner", text: `Hi! I am ${person.name}. Karibu kwenye chat, unaweza kuanza kuongea nami.`, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }]); } catch {} }, [person.name]);
-  function send(e: React.FormEvent) { e.preventDefault(); const user = getLocalUser(); if (!user) { setGate(true); return; } if (!user.paid) { setGate(true); return; } const clean = text.trim(); if (!clean) return; const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); const nextCount = user.messageCount + 1; const mine: Msg = { id: crypto.randomUUID(), from: "user", text: clean, time: now }; const all = [...messages, mine]; setMessages(all); localStorage.setItem(KEY + person.name, JSON.stringify(all)); setText(""); const rewardEvery = 10; if (nextCount % rewardEvery === 0) { const amount = Number((person.pay.match(/[\d,]+/)?.[0] || "0").replace(/,/g, "")); const next = updateLocalUser({ messageCount: nextCount, balance: user.balance + amount }); setTimeout(() => addForeign(`Great! Umefikia ujumbe 10. ${formatTzs(amount)} imeongezwa kwenye balance yako.`), 900); void next; } else { updateLocalUser({ messageCount: nextCount }); setTimeout(() => addForeign(reply(clean)), 900); } }
-  function addForeign(text: string) { const m: Msg = { id: crypto.randomUUID(), from: "foreigner", text, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }; setMessages(prev => { const all = [...prev, m]; localStorage.setItem(KEY + person.name, JSON.stringify(all)); return all; }); }
-  return <div className="min-h-screen bg-k-slate-50 font-jost"><header className="sticky top-0 z-10 flex items-center gap-3 border-b border-k-slate-200 bg-white px-4 py-3"><button onClick={() => navigate({ to: "/dashboard" })} className="rounded-xl p-2 hover:bg-k-slate-50"><ArrowLeft className="h-5 w-5" /></button><div className="text-2xl">{person.flag}</div><div><div className="font-bold text-k-slate-900">{person.name}, {person.age}</div><div className="text-xs text-k-green-700">{person.online ? "Online" : "Offline"}</div></div></header>
-    <main className="mx-auto flex min-h-[calc(100vh-65px)] max-w-2xl flex-col px-3 py-4"><div className="flex-1 space-y-3 overflow-y-auto pb-4">{messages.map(m => <div key={m.id} className={`flex ${m.from === "user" ? "justify-end" : "justify-start"}`}><div className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm ${m.from === "user" ? "bg-k-indigo text-white" : "border border-k-slate-200 bg-white text-k-slate-800"}`}><div>{m.text}</div><div className={`mt-1 text-[10px] ${m.from === "user" ? "text-white/70" : "text-k-slate-400"}`}>{m.time}</div></div></div>)}</div>
-      <form onSubmit={send} className="sticky bottom-2 flex gap-2 rounded-2xl border border-k-slate-200 bg-white p-2 shadow-lg"><input value={text} onChange={e => setText(e.target.value)} placeholder="Andika ujumbe..." className="w-full bg-transparent px-3 text-sm outline-none" /><button className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-k-indigo text-white"><Send className="h-4 w-4" /></button></form></main>
-    {gate && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center"><div className="w-full max-w-sm rounded-3xl bg-white p-6"><h2 className="text-lg font-extrabold text-k-slate-900">Jisajili ili kuendelea</h2><p className="mt-2 text-sm text-k-slate-500">Unaweza kufungua chat, lakini kutuma ujumbe kunahitaji kujisajili na kukamilisha malipo.</p><button onClick={() => navigate({ to: "/register" })} className="k-btn mt-5">Jisajili Sasa</button><button onClick={() => setGate(false)} className="mt-2 w-full rounded-xl border border-k-slate-200 bg-white px-4 py-3 text-sm font-semibold">Rudi nyuma</button></div></div>}
-  </div>;
+  const [text, setText] = useState("");
+  const [messages, setMessages] = useState<Msg[]>([]);
+  const [gate, setGate] = useState(false);
+  const [seconds, setSeconds] = useState(52);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(KEY + person.name);
+      if (raw) setMessages(JSON.parse(raw));
+      else setMessages([{ id: "welcome", from: "foreigner", text: "Salamu kutoka huku! Naomba tuanze kwa kujijana kidogo.", time: "" }]);
+    } catch {
+      setMessages([{ id: "welcome", from: "foreigner", text: "Salamu kutoka huku! Naomba tuanze kwa kujijana kidogo.", time: "" }]);
+    }
+  }, [person.name]);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setSeconds(s => (s <= 0 ? 59 : s - 1)), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  function send(e: React.FormEvent) {
+    e.preventDefault();
+    const user = getLocalUser();
+    if (!user || !user.paid) { setGate(true); return; }
+    const clean = text.trim();
+    if (!clean) return;
+    const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const nextCount = user.messageCount + 1;
+    const mine: Msg = { id: crypto.randomUUID(), from: "user", text: clean, time: now };
+    const all = [...messages, mine];
+    setMessages(all);
+    localStorage.setItem(KEY + person.name, JSON.stringify(all));
+    setText("");
+    if (nextCount % 10 === 0) {
+      const amount = Number((person.pay.match(/[\d,]+/)?.[0] || "0").replace(/,/g, ""));
+      updateLocalUser({ messageCount: nextCount, balance: user.balance + amount });
+      setTimeout(() => addForeign(`Hongera! Ujumbe 10 umekamilika. ${formatTzs(amount)} imeongezwa kwenye balance yako.`), 900);
+    } else {
+      updateLocalUser({ messageCount: nextCount });
+      setTimeout(() => addForeign(reply(clean)), 900);
+    }
+  }
+
+  function addForeign(message: string) {
+    const m: Msg = { id: crypto.randomUUID(), from: "foreigner", text: message, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) };
+    setMessages(prev => {
+      const all = [...prev, m];
+      localStorage.setItem(KEY + person.name, JSON.stringify(all));
+      return all;
+    });
+  }
+
+  return (
+    <div className="tw-chat-page flex min-h-screen flex-col font-jost">
+      <header className="tw-chat-header sticky top-0 z-20 flex items-center gap-3 border-b px-4 py-3">
+        <button aria-label="Rudi" onClick={() => navigate({ to: "/" })} className="rounded-full p-2 text-white/80 hover:bg-white/10"><ArrowLeft className="h-5 w-5" /></button>
+        <img src={person.avatar} alt={person.name} className="h-12 w-12 rounded-full border-2 border-teal-400/60 object-cover" />
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-lg font-extrabold text-white">{person.name}, {person.age}</div>
+          <div className="flex items-center gap-1.5 text-sm text-slate-400"><span className="h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_0_5px_rgba(52,211,153,.08)]" />Mtandaoni • {person.country}</div>
+        </div>
+        <div className="rounded-full bg-[#122a3a] px-4 py-2 text-lg font-extrabold tracking-wide text-amber-400">00:{String(seconds).padStart(2, "0")}</div>
+        <button aria-label="Funga" onClick={() => navigate({ to: "/" })} className="ml-1 rounded-full p-2 text-slate-400 hover:bg-white/10"><X className="h-7 w-7" /></button>
+      </header>
+
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-5 pb-3 pt-6">
+        <div className="flex-1 space-y-4 overflow-y-auto pb-5">
+          {messages.map(m => (
+            <div key={m.id} className={`flex ${m.from === "user" ? "justify-end" : "justify-start"}`}>
+              <div className={`max-w-[82%] rounded-[24px] px-5 py-4 text-[16px] leading-7 shadow-sm ${m.from === "user" ? "rounded-br-md bg-gradient-brand text-[#03161c]" : "rounded-tl-md bg-[#162d3c] text-slate-200"}`}>
+                <div>{m.text}</div>
+                {m.time && <div className={`mt-1 text-[10px] ${m.from === "user" ? "text-black/45" : "text-slate-500"}`}>{m.time}</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <form onSubmit={send} className="tw-chat-composer sticky bottom-2 flex items-center gap-3 border-t pt-4">
+          <button type="button" aria-label="Chaguo" className="hidden rounded-full p-2 text-slate-400 sm:block"><MoreHorizontal className="h-5 w-5" /></button>
+          <input value={text} onChange={e => setText(e.target.value)} placeholder="Andika ujumbe wako..." className="h-14 min-w-0 flex-1 rounded-full border border-[#213b4b] bg-[#162d3c] px-6 text-base text-white outline-none placeholder:text-slate-400 focus:border-teal-400/70" />
+          <button aria-label="Tuma ujumbe" className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-[#03161c] shadow-lg"><Send className="h-6 w-6" /></button>
+        </form>
+      </main>
+
+      {gate && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 sm:items-center"><div className="w-full max-w-sm rounded-3xl border border-[#244253] bg-[#102633] p-6 text-white shadow-2xl"><h2 className="text-lg font-extrabold">Jisajili ili kuendelea</h2><p className="mt-2 text-sm leading-6 text-slate-400">Unaweza kufungua chat, lakini kutuma ujumbe kunahitaji kujisajili na kukamilisha malipo.</p><button onClick={() => navigate({ to: "/register" })} className="mt-5 w-full rounded-xl bg-gradient-brand px-4 py-3 font-extrabold text-[#03161c]">Jisajili Sasa</button><button onClick={() => setGate(false)} className="mt-2 w-full rounded-xl border border-[#294556] bg-transparent px-4 py-3 text-sm font-semibold text-slate-300">Rudi nyuma</button></div></div>}
+    </div>
+  );
 }
-function reply(input: string) { const s = input.toLowerCase(); if (s.includes("hello") || s.includes("hi")) return "Hello! Nice to meet you 😊 What would you like to talk about?"; if (s.includes("habari")) return "I am good, thank you! Na wewe unaendeleaje?"; if (s.includes("jina")) return "My name is your chat partner. Tell me about yourself!"; return "That sounds interesting! Tell me more 😊"; }
+
+function reply(input: string) {
+  const s = input.toLowerCase();
+  if (s.includes("hello") || s.includes("hi")) return "Hello! Nice to meet you 😊 What would you like to talk about?";
+  if (s.includes("habari")) return "I am good, thank you! Na wewe unaendeleaje?";
+  if (s.includes("jina")) return "My name is your chat partner. Tell me about yourself!";
+  return "That sounds interesting! Tell me more 😊";
+}

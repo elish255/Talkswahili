@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { checkPaymentStatus, PAYMENT_AMOUNT, startPayment } from "@/lib/payment.functions";
 import { getLocalUser, updateLocalUser } from "@/lib/local-auth";
-import logo from "@/assets/talkswahili-logo.png";
+import logo from "@/assets/talkswahili-logo.jpg";
 
 export const Route = createFileRoute("/payment")({
   head: () => ({ meta: [{ title: "Lipa — TALKSWAHILI" }, { name: "description", content: "Lipia TALKSWAHILI kwa USSD Push moja kwa moja kwenye simu yako." }] }),
@@ -48,13 +48,13 @@ function PaymentPage() {
     } catch (err) { setLoading(false); setStatus("error"); setMessage(err instanceof Error ? err.message : "Imeshindikana kuanzisha malipo."); }
   }
 
-  return <div className="min-h-screen bg-k-slate-50 font-jost text-k-slate-800"><main className="mx-auto max-w-xl px-4 py-10">
-    <div className="mb-6 flex items-center gap-3"><img src={logo} alt="TALKSWAHILI" className="h-10 w-10 rounded-xl object-contain" /><div><div className="text-lg font-extrabold text-k-slate-900">TALKSWAHILI</div><div className="text-xs text-k-slate-500">Hatua 2 kati ya 2</div></div></div>
-    <section className="k-card p-6 md:p-8"><h1 className="text-2xl font-bold text-k-slate-900">Lipa sasa</h1><p className="mt-2 text-sm text-k-slate-500">Thibitisha malipo ya akaunti yako kwa USSD Push.</p>
-      <div className="mt-6 rounded-2xl bg-k-slate-50 p-5"><div className="text-xs text-k-slate-500">Kiasi cha kulipa</div><div className="mt-1 text-3xl font-extrabold text-k-indigo">{PAYMENT_AMOUNT.toLocaleString()} TZS</div></div>
-      {status === "waiting" ? <div className="mt-6 rounded-2xl border border-k-amber-100 bg-k-amber-100/60 p-5"><div className="font-bold text-k-slate-900">Push imetumwa</div><p className="mt-1 text-sm text-k-slate-700">{message} Ingiza namba yako ya siri kuthibitisha malipo.</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-white"><div className="h-full w-1/2 animate-pulse rounded-full bg-k-indigo" /></div></div> : <form onSubmit={onSubmit} className="mt-6"><label className="mb-1 block text-xs font-bold text-k-slate-500">Namba ya simu</label><div className="mb-4 flex items-center overflow-hidden rounded-xl border-[1.5px] border-k-slate-200 bg-k-slate-50"><span className="border-r border-k-slate-200 px-3 py-3 text-sm text-k-slate-500">🇹🇿 +255</span><input type="tel" required maxLength={15} placeholder="06XXXXXXXX" value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ""))} className="w-full bg-transparent px-3 py-3 text-sm outline-none" /></div>{status === "error" && <div className="mb-4 rounded-xl border border-k-red-300 bg-k-red-50 px-4 py-3 text-sm text-k-red-900">{message}</div>}<button disabled={loading} type="submit" className="k-btn-green hover:opacity-90 disabled:opacity-60">{loading ? "Inatuma Push..." : "🔒 LIPA SASA"}</button></form>}
-      {status === "success" && <div className="mt-5 rounded-xl bg-k-green-100 px-4 py-3 text-sm font-semibold text-k-green-800">{message}</div>}
-      <button onClick={() => navigate({ to: "/" })} className="mt-4 w-full rounded-xl border border-k-slate-200 bg-white px-4 py-3 text-sm font-semibold text-k-slate-700">Rudi nyuma</button>
+  return <div className="min-h-screen bg-[#07151f] font-jost text-white"><main className="mx-auto max-w-xl px-4 py-10">
+    <div className="mb-6 flex items-center gap-3"><img src={logo} alt="TALKSWAHILI" className="h-10 w-10 rounded-xl object-contain" /><div><div className="text-lg font-extrabold text-white">TALKSWAHILI</div><div className="text-xs text-slate-400">Hatua 2 kati ya 2</div></div></div>
+    <section className="k-card p-6 md:p-8"><h1 className="text-2xl font-bold text-white">Lipa sasa</h1><p className="mt-2 text-sm text-slate-400">Thibitisha malipo ya akaunti yako kwa USSD Push.</p>
+      <div className="mt-6 rounded-2xl bg-[#162d3c] p-5"><div className="text-xs text-slate-400">Kiasi cha kulipa</div><div className="mt-1 text-3xl font-extrabold text-k-indigo">{PAYMENT_AMOUNT.toLocaleString()} TZS</div></div>
+      {status === "waiting" ? <div className="mt-6 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5"><div className="font-bold text-white">Push imetumwa</div><p className="mt-1 text-sm text-slate-300">{message} Ingiza namba yako ya siri kuthibitisha malipo.</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-[#162d3c]"><div className="h-full w-1/2 animate-pulse rounded-full bg-k-indigo" /></div></div> : <form onSubmit={onSubmit} className="mt-6"><label className="mb-1 block text-xs font-bold text-slate-400">Namba ya simu</label><div className="mb-4 flex items-center overflow-hidden rounded-xl border-[1.5px] border-[#2a4555] bg-[#162d3c]"><span className="border-r border-[#2a4555] px-3 py-3 text-sm text-slate-400">🇹🇿 +255</span><input type="tel" required maxLength={15} placeholder="06XXXXXXXX" value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ""))} className="w-full bg-transparent px-3 py-3 text-sm outline-none" /></div>{status === "error" && <div className="mb-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{message}</div>}<button disabled={loading} type="submit" className="k-btn-green hover:opacity-90 disabled:opacity-60">{loading ? "Inatuma Push..." : "🔒 LIPA SASA"}</button></form>}
+      {status === "success" && <div className="mt-5 rounded-xl bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300">{message}</div>}
+      <button onClick={() => navigate({ to: "/" })} className="mt-4 w-full rounded-xl border border-[#2a4555] bg-[#162d3c] px-4 py-3 text-sm font-semibold text-slate-300">Rudi nyuma</button>
     </section>
   </main></div>;
 }

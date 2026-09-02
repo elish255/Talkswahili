@@ -261,3 +261,41 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @utility toast-in { animation: toast-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Shared TALKSWAHILI dark visual language — used on every screen, not only home. */
+@utility tw-page {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+@utility tw-surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.tw-chat-page {
+  background: linear-gradient(180deg, #07151f 0%, #091b26 100%);
+  color: #f5fbff;
+}
+.tw-chat-header {
+  background: rgba(7, 21, 31, .97);
+  border-color: #1d3442;
+}
+.tw-chat-composer {
+  background: #091b26;
+  border-color: #1d3442;
+}
+
+/* Keep the registration/payment/dashboard surfaces in the same dark family. */
+.k-card {
+  background: #102633;
+  border: 1px solid #234050;
+  color: #f5fbff;
+}
+.k-field {
+  border-color: #2a4555;
+  background: #162d3c;
+  color: #f5fbff;
+}
+.k-field::placeholder { color: #8193a0; }
+.k-field:focus { background: #193343; }
