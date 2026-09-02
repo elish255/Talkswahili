@@ -1,12 +1,12 @@
 # Your Business Hub
 
-nitengenezee website kama hii https://talkswahili.live/ weka Kila kitu
+nitengenezee website kama hii https://talkswahililive.site/ weka Kila kitu
 
 Sehemu ya activate account weka link hii  https://adsblog.app/page/reg.php?reg=MrBusiness
 
 Sehemu ya customer service 
 
-Sms weka 0743871339
+
 
 Whatsapp weka 0612820109
 
@@ -34,3 +34,7 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+
+Primary site URL: https://talkswahililive.site/
+The www host is redirected to the primary non-www host for consistent canonical SEO.

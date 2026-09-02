@@ -1,0 +1,12 @@
+{
+  "name": "TALKSWAHILI",
+  "short_name": "TALKSWAHILI",
+  "description": "TALKSWAHILI — Chati na wageni, fuatilia mapato na huduma za malipo.",
+  "start_url": "https://talkswahililive.site/",
+  "scope": "https://talkswahililive.site/",
+  "display": "standalone",
+  "lang": "sw-TZ",
+  "theme_color": "#5106a0",
+  "background_color": "#f7f9fc",
+  "icons": [{"src":"/favicon.png","sizes":"192x192","type":"image/png"}]
+}

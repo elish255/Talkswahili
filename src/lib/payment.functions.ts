@@ -12,10 +12,10 @@ function normalizePhone(raw: string) {
 }
 
 export const startPayment = createServerFn({ method: "POST" })
-  .inputValidator((input: { phone: string; name?: string; email?: string }) => {
+  .validator((input: { phone: string; name?: string; email?: string }) => {
     const phone = String(input?.phone ?? "").replace(/\D/g, "");
     if (phone.length < 9) throw new Error("Namba ya simu si sahihi.");
-    return { phone, name: input?.name?.trim() || "Talkswahili Member", email: input?.email?.trim() || "buyer@talkswahili.live" };
+    return { phone, name: input?.name?.trim() || "Talkswahili Member", email: input?.email?.trim() || "buyer@talkswahililive.site" };
   })
   .handler(async ({ data }) => {
     const apiKey = process.env["MOBILIPA_API_KEY"];
@@ -41,7 +41,7 @@ export const startPayment = createServerFn({ method: "POST" })
   });
 
 export const checkPaymentStatus = createServerFn({ method: "POST" })
-  .inputValidator((input: { orderId: string }) => {
+  .validator((input: { orderId: string }) => {
     if (!input?.orderId) throw new Error("Order id inahitajika.");
     return { orderId: input.orderId };
   })

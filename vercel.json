@@ -1,3 +1,10 @@
 {
-  "buildCommand": "npm run build"
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://talkswahililive.site/$1",
+      "permanent": true,
+      "has": [{"type": "host", "value": "www.talkswahililive.site"}]
+    }
+  ]
 }
