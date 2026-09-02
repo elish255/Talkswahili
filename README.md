@@ -38,3 +38,7 @@ npm run dev
 
 Primary site URL: https://talkswahililive.site/
 The www host is redirected to the primary non-www host for consistent canonical SEO.
+
+
+## Vercel domain setup
+Use one primary custom domain only. This project intentionally contains no `vercel.json` redirect rule, so configure the primary domain in Vercel and avoid adding an apex↔www redirect in the application.
