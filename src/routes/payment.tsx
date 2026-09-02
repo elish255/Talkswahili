@@ -1,200 +1,60 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { startPayment, checkPaymentStatus, PAYMENT_AMOUNT } from "@/lib/payment";
+import { checkPaymentStatus, PAYMENT_AMOUNT, startPayment } from "@/lib/payment.functions";
+import { getLocalUser, updateLocalUser } from "@/lib/local-auth";
+import logo from "@/assets/talkswahili-logo.png";
 
 export const Route = createFileRoute("/payment")({
-  head: () => ({
-    meta: [
-      { title: "Lipa — TALKSWAHILI" },
-      {
-        name: "description",
-        content:
-          "Lipia ada ya TALKSWAHILI kwa USSD Push. Weka namba yako ya simu na thibitisha malipo kwenye simu.",
-      },
-      { property: "og:title", content: "Lipa — TALKSWAHILI" },
-      { property: "og:description", content: "Lipia kwa USSD Push moja kwa moja kwenye simu yako." },
-    ],
-  }),
+  head: () => ({ meta: [{ title: "Lipa — TALKSWAHILI" }, { name: "description", content: "Lipia TALKSWAHILI kwa USSD Push moja kwa moja kwenye simu yako." }] }),
   component: PaymentPage,
 });
 
-
-
-type Phase = "form" | "waiting" | "failed";
-
 function PaymentPage() {
   const navigate = useNavigate();
-  const createOrder = useServerFn(startPayment);
-  const pollStatus = useServerFn(checkPaymentStatus);
-
-  const [ready, setReady] = useState(false);
+  const callStart = useServerFn(startPayment);
+  const callCheck = useServerFn(checkPaymentStatus);
   const [phone, setPhone] = useState("");
-  const [phase, setPhase] = useState<Phase>("form");
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [status, setStatus] = useState<"idle"|"waiting"|"success"|"error">("idle");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
 
-  useEffect(() => {
-    const raw = localStorage.getItem("talkswahili_user");
-    if (!raw) {
-      navigate({ to: "/register" });
-      return;
-    }
-    const user = JSON.parse(raw) as { hasPaid?: boolean; phone?: string; name?: string; email?: string };
-    if (user.hasPaid) {
-      navigate({ to: "/dashboard" });
-      return;
-    }
-    if (user.phone) setPhone(user.phone);
-    setReady(true);
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-    };
-  }, [navigate]);
+  useEffect(() => { const user = getLocalUser(); if (!user) navigate({ to: "/register" }); else setPhone(user.phone); return () => { if (timer.current) window.clearInterval(timer.current); }; }, [navigate]);
 
   async function onSubmit(e: React.FormEvent) {
-    const user = JSON.parse(localStorage.getItem("talkswahili_user") || "{}") as { name?: string; email?: string };
-    e.preventDefault();
-    setError(null);
-    setPhase("waiting");
+    e.preventDefault(); setLoading(true); setStatus("idle"); setMessage("");
+    const user = getLocalUser(); if (!user) { navigate({ to: "/register" }); return; }
     try {
-      const order = await createOrder({ data: { phone, name: user?.name, email: user?.email } });
-      setMessage(order.message);
+      const result = await callStart({ data: { phone, name: user.name, email: user.email } });
+      localStorage.setItem("talkswahili_pending_order", result.order_id);
+      if (result.reference) localStorage.setItem("talkswahili_payment_reference", result.reference);
+      setStatus("waiting"); setMessage(result.message); setLoading(false);
       let attempts = 0;
-      timer.current = setInterval(async () => {
-        attempts += 1;
+      timer.current = window.setInterval(async () => {
+        attempts++;
         try {
-          const res = await pollStatus({ data: { orderId: order.order_id } });
-          if (res.payment_status === "COMPLETED") {
-            if (timer.current) clearInterval(timer.current);
-            const user = JSON.parse(localStorage.getItem("talkswahili_user") || "{}");
-            localStorage.setItem("talkswahili_user", JSON.stringify({ ...user, hasPaid: true }));
-            navigate({ to: "/dashboard" });
-            return;
+          const s = await callCheck({ data: { orderId: result.order_id } });
+          if (s.payment_status === "COMPLETED" || s.payment_status === "SUCCESS") {
+            if (timer.current) window.clearInterval(timer.current);
+            updateLocalUser({ paid: true }); setStatus("success"); setMessage("Malipo yamefanikiwa. Karibu TALKSWAHILI!");
+            window.setTimeout(() => navigate({ to: "/dashboard" }), 900);
+          } else if (["FAILED", "CANCELLED", "REJECTED"].includes(s.payment_status)) {
+            if (timer.current) window.clearInterval(timer.current); setStatus("error"); setMessage(s.message || "Malipo hayajakamilika. Jaribu tena.");
           }
-          if (["CANCELLED", "USERCANCELLED", "REJECTED"].includes(res.payment_status)) {
-            if (timer.current) clearInterval(timer.current);
-            setPhase("failed");
-            setError("Malipo hayakukamilika. Tafadhali jaribu tena.");
-          }
-        } catch {
-          /* keep polling */
-        }
-        if (attempts >= 40) {
-          if (timer.current) clearInterval(timer.current);
-          setPhase("failed");
-          setError("Muda umeisha bila kupokea uthibitisho wa malipo. Jaribu tena.");
-        }
-      }, 4000);
-    } catch (err) {
-      setPhase("failed");
-      setError(err instanceof Error ? err.message : "Imeshindikana kuanzisha malipo.");
-    }
+        } catch { if (attempts >= 12 && timer.current) { window.clearInterval(timer.current); setStatus("error"); setMessage("Hatukupata uthibitisho bado. Angalia simu yako au jaribu tena."); } }
+        if (attempts >= 24 && timer.current) { window.clearInterval(timer.current); setStatus("error"); setMessage("Muda wa kusubiri umeisha. Kama umelipa, jaribu kuangalia tena."); }
+      }, 5000);
+    } catch (err) { setLoading(false); setStatus("error"); setMessage(err instanceof Error ? err.message : "Imeshindikana kuanzisha malipo."); }
   }
 
-  if (!ready) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-k-slate-50 font-jost text-k-slate-500">
-        Inapakia...
-      </main>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-k-slate-50 font-jost text-k-slate-800">
-      <header className="flex items-center justify-between bg-k-green-900 px-6 py-4">
-        <span className="text-lg font-extrabold tracking-tight text-white">
-          TALKSWAHILI <span className="text-k-amber-400">SITE</span>
-        </span>
-        <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] tracking-wide text-k-green-100">
-          MALIPO SALAMA
-        </span>
-      </header>
-
-      <main className="mx-auto max-w-xl px-4 pb-16 pt-7">
-        <div className="mb-6 flex gap-3 rounded-2xl border-[1.5px] border-k-red-300 bg-k-red-50 p-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-k-red-100 text-k-red-600">
-            🛡
-          </div>
-          <div>
-            <h2 className="text-xs font-bold tracking-widest text-k-red-600">LINDA PESA YAKO</h2>
-            <p className="mt-1 text-sm leading-relaxed text-k-red-900">
-              Lipia kupitia mfumo huu pekee 
-              Malipo nje ya mfumo huu ni batili na hayatakubaliwa.
-            </p>
-          </div>
-        </div>
-
-        <div className="mb-5 flex gap-2">
-          <span className="flex items-center gap-2 rounded-full border-[1.5px] border-k-green-800 bg-k-green-800 px-4 py-2 text-[13px] text-white">
-            🇹🇿 Tanzania
-          </span>
-        </div>
-
-        <section className="mb-5 overflow-hidden rounded-3xl border-[1.5px] border-k-slate-200 bg-white">
-          <div className="flex items-center gap-3 border-b border-k-slate-100 px-5 py-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-k-green-50 text-k-green-700">
-              ⚡
-            </div>
-            <div>
-              <h3 className="font-semibold">Tanzania</h3>
-              <p className="text-xs text-k-slate-500">Lipia moja kwa moja kwa USSD Push</p>
-            </div>
-          </div>
-
-          <div className="px-5 py-5">
-            <div className="mb-4 flex items-center justify-between rounded-2xl bg-k-green-50 px-4 py-3">
-              <span className="text-sm text-k-green-700">Kiasi cha kulipa</span>
-              <span className="text-lg font-bold text-k-green-900">
-                {PAYMENT_AMOUNT.toLocaleString()} TZS
-              </span>
-            </div>
-
-            {error && (
-              <div className="mb-4 rounded-xl border border-k-red-300 bg-k-red-50 px-4 py-3 text-sm text-k-red-900">
-                {error}
-              </div>
-            )}
-
-            {phase === "waiting" ? (
-              <div className="rounded-2xl border-[1.5px] border-k-slate-200 p-6 text-center">
-                <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-k-green-100 border-t-k-green-700" />
-                <p className="font-semibold text-k-green-900">Subiri uthibitisho...</p>
-                <p className="mt-1 text-sm text-k-slate-500">
-                  {message ?? "Push USSD imetumwa kwenye simu yako."} Ingiza namba yako ya siri
-                  kuthibitisha malipo.
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={onSubmit}>
-                <label className="mb-1 block text-xs font-bold text-k-slate-500" htmlFor="tz-phone">
-                  Namba ya simu
-                </label>
-                <div className="mb-4 flex items-center overflow-hidden rounded-xl border-[1.5px] border-k-slate-200 bg-k-slate-50">
-                  <span className="border-r border-k-slate-200 px-3 py-3 text-sm text-k-slate-500">
-                    🇹🇿 +255
-                  </span>
-                  <input
-                    id="tz-phone"
-                    type="tel"
-                    required
-                    maxLength={12}
-                    placeholder="06XXXXXXXX"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                    className="w-full bg-transparent px-3 py-3 text-sm outline-none"
-                  />
-                </div>
-                <button type="submit" className="k-btn-green hover:opacity-90">
-                  🔒 LIPA SASA
-                </button>
-              </form>
-            )}
-          </div>
-        </section>
-
-      </main>
-    </div>
-  );
+  return <div className="min-h-screen bg-k-slate-50 font-jost text-k-slate-800"><main className="mx-auto max-w-xl px-4 py-10">
+    <div className="mb-6 flex items-center gap-3"><img src={logo} alt="TALKSWAHILI" className="h-10 w-10 rounded-xl object-contain" /><div><div className="text-lg font-extrabold text-k-slate-900">TALKSWAHILI</div><div className="text-xs text-k-slate-500">Hatua 2 kati ya 2</div></div></div>
+    <section className="k-card p-6 md:p-8"><h1 className="text-2xl font-bold text-k-slate-900">Lipa sasa</h1><p className="mt-2 text-sm text-k-slate-500">Thibitisha malipo ya akaunti yako kwa USSD Push.</p>
+      <div className="mt-6 rounded-2xl bg-k-slate-50 p-5"><div className="text-xs text-k-slate-500">Kiasi cha kulipa</div><div className="mt-1 text-3xl font-extrabold text-k-indigo">{PAYMENT_AMOUNT.toLocaleString()} TZS</div></div>
+      {status === "waiting" ? <div className="mt-6 rounded-2xl border border-k-amber-100 bg-k-amber-100/60 p-5"><div className="font-bold text-k-slate-900">Push imetumwa</div><p className="mt-1 text-sm text-k-slate-700">{message} Ingiza namba yako ya siri kuthibitisha malipo.</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-white"><div className="h-full w-1/2 animate-pulse rounded-full bg-k-indigo" /></div></div> : <form onSubmit={onSubmit} className="mt-6"><label className="mb-1 block text-xs font-bold text-k-slate-500">Namba ya simu</label><div className="mb-4 flex items-center overflow-hidden rounded-xl border-[1.5px] border-k-slate-200 bg-k-slate-50"><span className="border-r border-k-slate-200 px-3 py-3 text-sm text-k-slate-500">🇹🇿 +255</span><input type="tel" required maxLength={15} placeholder="06XXXXXXXX" value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ""))} className="w-full bg-transparent px-3 py-3 text-sm outline-none" /></div>{status === "error" && <div className="mb-4 rounded-xl border border-k-red-300 bg-k-red-50 px-4 py-3 text-sm text-k-red-900">{message}</div>}<button disabled={loading} type="submit" className="k-btn-green hover:opacity-90 disabled:opacity-60">{loading ? "Inatuma Push..." : "🔒 LIPA SASA"}</button></form>}
+      {status === "success" && <div className="mt-5 rounded-xl bg-k-green-100 px-4 py-3 text-sm font-semibold text-k-green-800">{message}</div>}
+      <button onClick={() => navigate({ to: "/" })} className="mt-4 w-full rounded-xl border border-k-slate-200 bg-white px-4 py-3 text-sm font-semibold text-k-slate-700">Rudi nyuma</button>
+    </section>
+  </main></div>;
 }

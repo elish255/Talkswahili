@@ -1,10 +1,11 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { getLocalUser } from "@/lib/local-auth";
 import {
   Headphones,
   MessageCircle,
   Phone,
-  Send,
   Star,
   TrendingUp,
   Video,
@@ -43,94 +44,22 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-function ChatModal({
-  person,
-  onClose,
-}: {
-  person: (typeof people)[number];
-  onClose: () => void;
-}) {
-  const [messages, setMessages] = useState<{ from: "foreigner" | "user"; text: string }[]>([
-    { from: "foreigner", text: `Hi! Mimi ni ${person.name}. Habari yako?` },
-  ]);
-  const [text, setText] = useState("");
-  const [sending, setSending] = useState(false);
-  const send = () => {
-    const value = text.trim();
-    if (!value || sending) return;
-    setText("");
-    setMessages((m) => [...m, { from: "user", text: value }]);
-    const user = JSON.parse(localStorage.getItem("talkswahili_user") || "{}");
-    const nextCount = Number(user.messageCount || 0) + 1;
-    let nextBalance = Number(user.balance || 0);
-    if (nextCount % 10 === 0) {
-      const reward = Number(String(person.pay).replace(/[^0-9]/g, "")) || 0;
-      nextBalance += reward;
-      user.lastReward = reward;
-    }
-    localStorage.setItem("talkswahili_user", JSON.stringify({ ...user, messageCount: nextCount, balance: nextBalance }));
-    setSending(true);
-    setTimeout(() => {
-      const replies = [
-        `Hello! Nimefurahi kuongea na wewe 😊`,
-        `Tell me more about yourself.`,
-        `That sounds interesting! Unaishi wapi?`,
-        `I am online, unaweza kuendelea kuongea nami.`,
-      ];
-      setMessages((m) => [...m, { from: "foreigner", text: replies[m.length % replies.length] }]);
-      setSending(false);
-    }, 1200);
-  };
+function ActivateModal({ title, onClose }: { title: string; onClose: () => void }) {
+  const navigate = useNavigate();
+  const isInstall = title === "Install App";
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-0 sm:items-center sm:p-4">
-      <div className="flex h-[88vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-card sm:h-[680px] sm:rounded-3xl">
-        <div className="flex items-center gap-3 border-b border-border p-4">
-          <img src={person.avatar} alt={person.name} className="h-11 w-11 rounded-full object-cover" />
-          <div className="flex-1"><p className="font-bold">{person.name}</p><p className="text-xs text-success">{person.online ? "Online" : "Offline"}</p></div>
-          <button onClick={onClose} className="rounded-xl p-2 text-muted-foreground"><X /></button>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 sm:items-center">
+      <div className="w-full max-w-md rounded-3xl border border-border bg-card p-5 shadow-glow">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/20 text-primary"><ShieldCheck className="h-5 w-5" /></span><h3 className="text-base font-extrabold">{title}</h3></div>
+          <button aria-label="Funga" onClick={onClose} className="text-muted-foreground"><X className="h-5 w-5" /></button>
         </div>
-        <div className="flex-1 space-y-3 overflow-y-auto p-4">
-          {messages.map((m, i) => (
-            <div key={i} className={`flex ${m.from === "user" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${m.from === "user" ? "bg-gradient-brand text-primary-foreground" : "bg-secondary"}`}>{m.text}</div>
-            </div>
-          ))}
-          {sending && <p className="text-xs text-muted-foreground">Anaandika...</p>}
-        </div>
-        <div className="border-t border-border p-3">
-          <div className="flex gap-2">
-            <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Andika ujumbe..." className="min-w-0 flex-1 rounded-2xl border border-border bg-secondary px-4 py-3 text-sm outline-none" />
-            <button onClick={send} className="bg-gradient-brand flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-primary-foreground"><Send className="h-4 w-4" /></button>
-          </div>
-        </div>
+        <p className="mt-3 text-sm text-muted-foreground">{isInstall ? "TALKSWAHILI inaweza kuwekwa kwenye home screen ya simu yako kwa matumizi ya haraka." : `${title} inapatikana baada ya akaunti yako kusajiliwa na malipo kuthibitishwa.`}</p>
+        {!isInstall && <button onClick={() => navigate({ to: "/register" })} className="bg-gradient-gold mt-4 flex h-12 w-full items-center justify-center rounded-2xl text-sm font-extrabold text-gold-foreground">Jisajili Sasa</button>}
+        <button onClick={onClose} className="mt-2 h-11 w-full rounded-2xl border border-border bg-secondary text-sm font-semibold">Baadaye</button>
       </div>
     </div>
   );
-}
-
-function WithdrawModal({ balance, onClose, onWithdraw }: { balance: number; onClose: () => void; onWithdraw: (amount: number, phone: string) => void }) {
-  const [amount, setAmount] = useState("");
-  const [phone, setPhone] = useState("");
-  const [error, setError] = useState("");
-  const submit = () => {
-    const n = Number(amount);
-    if (!Number.isFinite(n) || n < 50000) return setError("Kiasi cha chini cha kutoa ni TZS 50,000.");
-    if (n > balance) return setError("Salio lako halitoshi.");
-    if (phone.replace(/\D/g, "").length < 9) return setError("Namba ya simu si sahihi.");
-    onWithdraw(n, phone);
-  };
-  return <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 sm:items-center">
-    <div className="w-full max-w-md rounded-3xl bg-card p-5">
-      <div className="flex items-center justify-between"><h3 className="text-lg font-extrabold">Toa Pesa</h3><button onClick={onClose}><X /></button></div>
-      <p className="mt-2 text-sm text-muted-foreground">Salio: TZS {balance.toLocaleString()}</p>
-      {error && <p className="mt-3 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
-      <label className="mt-4 block text-xs font-bold">Amount</label>
-      <input inputMode="numeric" value={amount} onChange={e=>setAmount(e.target.value.replace(/\D/g,""))} className="k-field mt-1" placeholder="50000" />
-      <label className="mt-4 block text-xs font-bold">Phone number</label>
-      <input inputMode="tel" value={phone} onChange={e=>setPhone(e.target.value)} className="k-field mt-1" placeholder="06XXXXXXXX" />
-      <button onClick={submit} className="k-btn-green mt-5">Toa Pesa</button>
-    </div>
-  </div>;
 }
 
 function StatCard({
@@ -173,30 +102,10 @@ function StatCard({
 }
 
 function Index() {
+  const [modal, setModal] = useState<string | null>(null);
   const navigate = useNavigate();
-  const [chatPerson, setChatPerson] = useState<(typeof people)[number] | null>(null);
-  const [withdrawOpen, setWithdrawOpen] = useState(false);
-  const [balance, setBalance] = useState(0);
-  const [withdrawn, setWithdrawn] = useState(0);
-  useEffect(() => {
-    try {
-      const user = JSON.parse(localStorage.getItem("talkswahili_user") || "{}");
-      setBalance(Number(user.balance || 0));
-      setWithdrawn(Number(user.withdrawn || 0));
-    } catch {}
-  }, []);
-  const openChat = (p: (typeof people)[number]) => {
-    const user = JSON.parse(localStorage.getItem("talkswahili_user") || "null");
-    if (!user) { navigate({ to: "/register" }); return; }
-    if (!user.hasPaid) { navigate({ to: "/payment" }); return; }
-    setChatPerson(p);
-  };
-  const doWithdraw = (amount: number, phone: string) => {
-    const user = JSON.parse(localStorage.getItem("talkswahili_user") || "{}");
-    const next = { ...user, balance: balance - amount, withdrawn: withdrawn + amount, withdrawalPhone: phone };
-    localStorage.setItem("talkswahili_user", JSON.stringify(next));
-    setBalance(balance - amount); setWithdrawn(withdrawn + amount); setWithdrawOpen(false);
-  };
+  const openChat = (name: string) => { navigate({ to: "/chat", search: { person: name } }); };
+  const registerOrDashboard = () => { const u = getLocalUser(); if (u?.paid) navigate({ to: "/dashboard" }); else navigate({ to: "/register" }); };
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 pb-16 pt-6">
@@ -222,19 +131,19 @@ function Index() {
         </div>
       </header>
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <button
-          onClick={() => alert("Install App: tumia chaguo la Add to Home Screen kwenye browser yako.")}
+          onClick={registerOrDashboard}
+          className="bg-gradient-gold flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold text-gold-foreground shadow-glow"
+        >
+          Jisajili Sasa
+        </button>
+        <button
+          onClick={() => setModal("Install App")}
           className="bg-gradient-brand flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold text-primary-foreground shadow-glow"
         >
           <img src={logo} alt="" width={24} height={24} className="h-6 w-6 rounded-lg object-contain" />
           Install App
-        </button>
-        <button
-          onClick={() => navigate({ to: "/register" })}
-          className="bg-gradient-brand flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold text-primary-foreground shadow-glow"
-        >
-          Jisajili Sasa
         </button>
         <a
           href="#huduma"
@@ -242,6 +151,7 @@ function Index() {
         >
           <Headphones className="h-4 w-4" /> Customer Care
         </a>
+        <button onClick={() => navigate({ to: "/dashboard" })} className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-secondary text-sm font-bold">Dashboard</button>
       </div>
 
       <section className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -254,12 +164,12 @@ function Index() {
         />
         <StatCard
           label="Salio la Sasa (Current Balance)"
-          value={`TZS ${balance.toLocaleString()}`}
+          value="TZS 0"
           tone="accent"
           icon={<Wallet className="h-4 w-4" />}
           action={
             <button
-              onClick={() => setWithdrawOpen(true)}
+              onClick={() => setModal("Toa Pesa")}
               className="bg-gradient-gold h-10 w-full rounded-2xl text-sm font-bold text-gold-foreground"
             >
               Toa Pesa
@@ -268,7 +178,7 @@ function Index() {
         />
         <StatCard
           label="Pesa Iliyotolewa (Withdrawn)"
-          value={`TZS ${withdrawn.toLocaleString()}`}
+          value="TZS 0"
           hint="Jumla ya pesa ambazo tayari umeshatoa"
           tone="gold"
           icon={<ArrowDownToLine className="h-4 w-4" />}
@@ -320,19 +230,19 @@ function Index() {
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2">
                 <button
-                  onClick={() => openChat(p)}
+                  onClick={() => openChat(p.name)}
                   className="bg-gradient-brand flex h-10 items-center justify-center gap-1 rounded-xl text-xs font-bold text-primary-foreground"
                 >
                   <MessageCircle className="h-3.5 w-3.5" /> Chat
                 </button>
                 <button
-                  onClick={() => openChat(p)}
+                  onClick={() => setModal(`Voice Call na ${p.name}`)}
                   className="flex h-10 items-center justify-center gap-1 rounded-xl border border-border bg-secondary text-xs font-bold"
                 >
                   <Phone className="h-3.5 w-3.5" /> Voice Call
                 </button>
                 <button
-                  onClick={() => openChat(p)}
+                  onClick={() => setModal(`Video Call na ${p.name}`)}
                   className="flex h-10 items-center justify-center gap-1 rounded-xl border border-border bg-secondary text-xs font-bold"
                 >
                   <Video className="h-3.5 w-3.5" /> Video Call
@@ -414,7 +324,7 @@ function Index() {
           Gusa hapa chini ili app ijiweke kwenye home screen — kuingia kwa haraka muda wowote.
         </p>
         <button
-          onClick={() => alert("Install App: tumia chaguo la Add to Home Screen kwenye browser yako.")}
+          onClick={() => setModal("Install App")}
           className="bg-gradient-brand mt-3 h-12 w-full rounded-2xl text-sm font-bold text-primary-foreground shadow-glow"
         >
           Install App
@@ -423,8 +333,7 @@ function Index() {
 
       <PayoutToasts />
 
-      {chatPerson && <ChatModal person={chatPerson} onClose={() => setChatPerson(null)} />}
-      {withdrawOpen && <WithdrawModal balance={balance} onClose={() => setWithdrawOpen(false)} onWithdraw={doWithdraw} />}
+      {modal && <ActivateModal title={modal} onClose={() => setModal(null)} />}
     </main>
   );
 }
