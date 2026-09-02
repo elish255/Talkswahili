@@ -25,17 +25,21 @@ const WHATSAPP_LINK = "https://wa.me/255612820109";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Talkswahili — Chati na Wageni, Lipwa Papo Hapo" },
+      { title: "TALKSWAHILI — Chati na Wageni, Lipwa Papo Hapo" },
       {
         name: "description",
         content:
-          "Chati, voice call na video call na wageni kwa Kiswahili, fuatilia mapato yako na toa pesa papo hapo kwenye dashibodi ya Talkswahili.",
+          "TALKSWAHILI ni jukwaa la kuchat na wageni kwa Kiswahili, voice call na video call, kufuatilia mapato na kutoa pesa papo hapo Tanzania.",
       },
-      { property: "og:title", content: "Talkswahili — Chati na Wageni, Lipwa Papo Hapo" },
+      {
+        name: "keywords",
+        content: "TALKSWAHILI, Talkswahili, Talk Swahili, chat na wageni, kuchat na wazungu, lipwa kwa kuchat, kazi online Tanzania, kipato online Tanzania, talkswahililive.site",
+      },
+      { property: "og:title", content: "TALKSWAHILI — Chati na Wageni, Lipwa Papo Hapo" },
       {
         property: "og:description",
         content:
-          "Chati na wageni waliopo mtandaoni, fuatilia mapato yako na toa pesa kupitia M-Pesa, Tigo Pesa au Airtel Money.",
+          "TALKSWAHILI — chati na wageni waliopo mtandaoni, pata kipato kwa kuchat, fuatilia balance na tumia huduma za malipo kwa USSD Push.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
