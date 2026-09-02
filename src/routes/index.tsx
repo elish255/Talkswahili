@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 
-import logo from "@/assets/talkswahili-logo.png";
+import logo from "@/assets/talkswahili-logo.jpg";
 import { PayoutToasts } from "@/components/PayoutToasts";
 import { people, reviews, withdrawals } from "@/data/people";
 
@@ -173,7 +173,7 @@ function Index() {
           icon={<Wallet className="h-4 w-4" />}
           action={
             <button
-              onClick={() => setModal("Toa Pesa")}
+              onClick={() => navigate({ to: "/dashboard" })}
               className="bg-gradient-gold h-10 w-full rounded-2xl text-sm font-bold text-gold-foreground"
             >
               Toa Pesa
