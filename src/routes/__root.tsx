@@ -78,16 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#0b1620" },
+      { name: "application-name", content: "TALKSWAHILI" },
+      { name: "author", content: "TALKSWAHILI" },
       { title: "TALKSWAHILI — Chati na Wageni, Lipwa Papo Hapo" },
       {
         name: "description",
         content:
-          "TALKSWAHILI ni dashibodi ya kuchati, voice call na video call na wageni kwa Kiswahili na kupokea malipo papo hapo.",
+          "TALKSWAHILI ni jukwaa la chat na wageni kwa Kiswahili, voice call na video call, pamoja na dashibodi ya kufuatilia matumizi na balance.",
       },
       {
         name: "keywords",
         content:
-          "TALKSWAHILI, Talkswahili, Talk Swahili, talkswahililive.site, Kiswahili ni Fursa, chat na wageni, kuchat na wazungu, lipwa kwa kuchat, kazi online Tanzania, kipato online Tanzania, online chat jobs Tanzania, foreign chat Tanzania, chat Tanzania, voice call, video call, USSD Push, Mobilipa",
+          "TALKSWAHILI, Talkswahili, Talk Swahili, TALKSWAHILI Live, talkswahililive.site, Kiswahili ni Fursa, chat na wageni, kuchat na wazungu, kazi online Tanzania, kipato online Tanzania, chat Tanzania, voice call, video call, USSD Push, Mobilipa",
       },
       { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
       { name: "googlebot", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
@@ -117,7 +119,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "canonical", href: "https://talkswahililive.site/" },
     ],
@@ -134,6 +136,40 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="sw">
       <head>
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": "https://talkswahililive.site/#organization",
+                  "name": "TALKSWAHILI",
+                  "url": "https://talkswahililive.site/",
+                  "logo": "https://talkswahililive.site/favicon.png",
+                  "areaServed": "TZ",
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": "https://talkswahililive.site/#website",
+                  "name": "TALKSWAHILI",
+                  "url": "https://talkswahililive.site/",
+                  "inLanguage": "sw-TZ",
+                  "publisher": { "@id": "https://talkswahililive.site/#organization" },
+                },
+                {
+                  "@type": "WebPage",
+                  "@id": "https://talkswahililive.site/#webpage",
+                  "url": "https://talkswahililive.site/",
+                  "name": "TALKSWAHILI — Chati na Wageni, Lipwa Papo Hapo",
+                  "isPartOf": { "@id": "https://talkswahililive.site/#website" },
+                  "inLanguage": "sw-TZ",
+                },
+              ],
+            }),
+          }}
+        />
       </head>
       <body>
         {children}

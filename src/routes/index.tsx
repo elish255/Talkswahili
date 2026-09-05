@@ -33,7 +33,7 @@ export const Route = createFileRoute("/")({
       {
         name: "keywords",
         content:
-          "TALKSWAHILI, Talkswahili, Talk Swahili, chat na wageni, kuchat na wazungu, lipwa kwa kuchat, kazi online Tanzania, kipato online Tanzania, talkswahililive.site",
+          "TALKSWAHILI, Talkswahili, Talk Swahili, TALKSWAHILI Live, talkswahililive.site, chat na wageni, kuchat na wazungu, kazi online Tanzania, kipato online Tanzania, Kiswahili ni Fursa, voice call, video call, chat Tanzania",
       },
       { property: "og:title", content: "TALKSWAHILI — Chati na Wageni, Lipwa Papo Hapo" },
       {
@@ -176,6 +176,22 @@ function Index() {
         </a>
       </div>
 
+      <section className="mt-5 rounded-3xl border border-primary/25 bg-card p-5" aria-labelledby="talkswahili-intro-title">
+        <h2 id="talkswahili-intro-title" className="text-xl font-extrabold tracking-tight">
+          TALKSWAHILI — Chati na Wageni kwa Kiswahili
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          TALKSWAHILI ni jukwaa la Tanzania la kuwasiliana na wageni kupitia chat, voice call na video call.
+          Unaweza kuona watu waliopo mtandaoni, kuanza mazungumzo, kufuatilia balance yako na kutumia dashibodi ya TALKSWAHILI.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold text-muted-foreground">
+          <span className="rounded-full bg-secondary px-3 py-1.5">TALKSWAHILI Live</span>
+          <span className="rounded-full bg-secondary px-3 py-1.5">Chat na Wageni</span>
+          <span className="rounded-full bg-secondary px-3 py-1.5">Kiswahili ni Fursa</span>
+          <span className="rounded-full bg-secondary px-3 py-1.5">Tanzania</span>
+        </div>
+      </section>
+
       <section className="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
         <StatCard
           label="Mapato Yote (Net Profit)"
@@ -211,7 +227,7 @@ function Index() {
         onClick={registerOrDashboard}
         className="bg-gradient-brand mt-3 flex h-12 w-full items-center justify-center rounded-2xl text-sm font-bold text-primary-foreground shadow-glow"
       >
-        Fungua Account Hapa
+        Jisajili Sasa
       </button>
 
       <section className="mt-8">
@@ -339,6 +355,30 @@ function Index() {
               <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{review.text}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="mt-8 rounded-3xl border border-border bg-card p-5" aria-labelledby="faq-title">
+        <h2 id="faq-title" className="text-lg font-bold">Kuhusu TALKSWAHILI</h2>
+        <div className="mt-4 space-y-4 text-sm">
+          <div>
+            <h3 className="font-bold">TALKSWAHILI ni nini?</h3>
+            <p className="mt-1 leading-6 text-muted-foreground">
+              TALKSWAHILI ni platform ya chat na wageni inayolenga watumiaji wa Tanzania na wanaozungumza Kiswahili.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-bold">Ninaanzaje kutumia TALKSWAHILI?</h3>
+            <p className="mt-1 leading-6 text-muted-foreground">
+              Jisajili kupitia mfumo wa TALKSWAHILI, fuata hatua za malipo ya USSD Push, kisha tumia dashibodi kuendelea na huduma zinazopatikana.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-bold">Naweza kupata TALKSWAHILI wapi?</h3>
+            <p className="mt-1 leading-6 text-muted-foreground">
+              Tovuti hii ndiyo ukurasa rasmi wa TALKSWAHILI Live. Tumia anwani hii unapoitafuta TALKSWAHILI kwenye Google.
+            </p>
+          </div>
         </div>
       </section>
 
