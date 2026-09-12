@@ -299,3 +299,331 @@
 }
 .k-field::placeholder { color: #8193a0; }
 .k-field:focus { background: #193343; }
+
+
+/* TALKSWAHILI manual Lipa Namba payment UI */
+.payment-main-card {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 24px;
+  background: linear-gradient(145deg, #102532 0%, #0b1d28 100%);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+}
+
+.manual-payment-popup {
+  animation: manual-popup-in .22s ease-out both;
+}
+
+@keyframes manual-popup-in {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.section-card {
+  border: 1px solid #e0e7ef;
+  border-radius: 24px;
+  background: #ffffff;
+  overflow: hidden;
+  color: #142235;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, .10);
+}
+
+.ussd-header {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 28px 30px;
+  border-bottom: 1px solid #edf1f5;
+  color: #52657c;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.ussd-divider {
+  height: 2px;
+  flex: 1;
+  background: #e4eaf1;
+}
+
+.payment-choice-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 25px 30px 20px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.payment-choice-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: #8292a7;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.payment-choice-heading h2 {
+  margin: 0;
+  color: #142235;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.payment-choice-heading p {
+  margin: 5px 0 0;
+  color: #738197;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.lipa-number-pill {
+  flex: 0 0 auto;
+  min-width: 142px;
+  padding: 12px 15px;
+  border: 1px solid #e2e8ef;
+  border-radius: 15px;
+  background: #f8fafc;
+  text-align: center;
+}
+
+.lipa-number-pill span {
+  display: block;
+  color: #8292a7;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.lipa-number-pill strong {
+  display: block;
+  margin-top: 2px;
+  color: #142235;
+  font-size: 19px;
+  letter-spacing: .5px;
+}
+
+.operator-item {
+  border-bottom: 1px solid #edf1f5;
+  background: #fff;
+}
+
+.operator-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 18px;
+  padding: 24px 30px;
+  background: transparent;
+  border: 0;
+  color: #142235;
+  text-align: left;
+  cursor: pointer;
+}
+
+.operator-toggle:hover {
+  background: #fbfcfd;
+}
+
+.operator-logo-wrap {
+  display: flex;
+  flex: 0 0 132px;
+  height: 88px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e7edf3;
+  border-radius: 22px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.operator-logo-wrap img {
+  max-width: 102px;
+  max-height: 62px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.operator-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.operator-name {
+  color: #17283d;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.operator-ussd {
+  margin-top: 5px;
+  color: #8b9aaf;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.chevron {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  color: #93a4b8;
+  transition: transform .2s ease;
+}
+
+.operator-open .chevron {
+  transform: rotate(180deg);
+}
+
+.operator-steps {
+  padding: 0 30px 25px 180px;
+  background: #fbfcfd;
+}
+
+.steps-list {
+  margin: 0;
+  padding: 18px 0 0;
+  list-style: none;
+}
+
+.step-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 9px 0;
+  color: #52657c;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.step-row strong {
+  color: #17283d;
+}
+
+.step-num {
+  display: inline-flex;
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e9eef4;
+  color: #566a81;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.step-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.step-row.highlight {
+  margin: 7px 0;
+  padding: 12px;
+  border: 1px solid #dce6ef;
+  border-radius: 13px;
+  background: #f2f6fa;
+}
+
+.step-value {
+  color: #142235;
+  font-weight: 900;
+  letter-spacing: .4px;
+}
+
+.copy-btn {
+  border: 0;
+  border-radius: 8px;
+  padding: 5px 9px;
+  background: #142235;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  opacity: .86;
+}
+
+.biz-tag {
+  margin: 20px 30px 0;
+  padding: 13px 15px;
+  border-radius: 12px;
+  background: #f3f6f9;
+  color: #6e7d90;
+  font-size: 13px;
+}
+
+.biz-tag strong {
+  color: #17283d;
+}
+
+@media (max-width: 640px) {
+  .ussd-header {
+    padding: 21px 18px;
+    gap: 12px;
+    font-size: 12px;
+    letter-spacing: 1.2px;
+  }
+
+  .payment-choice-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 21px 18px 18px;
+  }
+
+  .payment-choice-heading h2 {
+    font-size: 22px;
+  }
+
+  .lipa-number-pill {
+    width: 100%;
+  }
+
+  .operator-toggle {
+    gap: 12px;
+    padding: 18px;
+  }
+
+  .operator-logo-wrap {
+    flex-basis: 76px;
+    width: 76px;
+    height: 66px;
+    border-radius: 16px;
+  }
+
+  .operator-logo-wrap img {
+    max-width: 62px;
+    max-height: 46px;
+  }
+
+  .operator-name {
+    font-size: 16px;
+  }
+
+  .operator-ussd {
+    font-size: 13px;
+  }
+
+  .chevron {
+    width: 22px;
+    height: 22px;
+  }
+
+  .operator-steps {
+    padding: 0 18px 20px 18px;
+  }
+
+  .biz-tag {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+}
