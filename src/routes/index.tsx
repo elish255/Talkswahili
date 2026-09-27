@@ -18,9 +18,6 @@ import { PayoutToasts } from "@/components/PayoutToasts";
 import { people, reviews, withdrawals } from "@/data/people";
 import { supabase } from "@/integrations/supabase/client";
 
-const WHATSAPP_NUMBER = "0612820109";
-const WHATSAPP_LINK = "https://wa.me/255612820109";
-
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -131,13 +128,24 @@ function Index() {
   };
 
   const registerOrDashboard = async () => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) {
+    try {
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+        navigate({ to: "/register" });
+        return;
+      }
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("activated")
+        .eq("id", data.user.id)
+        .maybeSingle();
+      navigate({ to: profile?.activated ? "/dashboard" : "/payment" });
+    } catch (error) {
+      console.error("Registration navigation check failed:", error);
+      // Navigation to registration must still work if Supabase environment
+      // variables are missing; Supabase is only required when submitting.
       navigate({ to: "/register" });
-      return;
     }
-    const { data: profile } = await supabase.from("profiles").select("activated").eq("id", data.user.id).maybeSingle();
-    navigate({ to: profile?.activated ? "/dashboard" : "/payment" });
   };
 
   return (
@@ -173,12 +181,12 @@ function Index() {
           <img src={logo} alt="" width={24} height={24} className="h-6 w-6 rounded-lg bg-white object-contain" />
           Install App
         </button>
-        <a
-          href="#huduma"
+        <button
+          onClick={() => navigate({ to: "/login" })}
           className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-secondary text-sm font-bold"
         >
           <Headphones className="h-4 w-4" /> Customer Care
-        </a>
+        </button>
       </div>
 
       <section className="mt-5 rounded-3xl border border-primary/25 bg-card p-5" aria-labelledby="talkswahili-intro-title">
@@ -301,15 +309,13 @@ function Index() {
 
       <section id="huduma" className="mt-8 rounded-3xl border border-border bg-card p-5">
         <h2 className="text-lg font-bold">Huduma kwa Wateja</h2>
-        <p className="mt-1 text-xs text-muted-foreground">Una swali au changamoto? Wasiliana nasi moja kwa moja.</p>
-        <a
-          href={WHATSAPP_LINK}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-gradient-brand mt-4 flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold text-primary-foreground"
+        <p className="mt-1 text-xs text-muted-foreground">Ingia kwanza ili kufikia huduma kwa wateja.</p>
+        <button
+          onClick={() => navigate({ to: "/login" })}
+          className="bg-gradient-brand mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-sm font-bold text-primary-foreground"
         >
-          <MessageCircle className="h-4 w-4" /> WhatsApp: {WHATSAPP_NUMBER}
-        </a>
+          <Headphones className="h-4 w-4" /> Ingia kwa Huduma
+        </button>
       </section>
 
       <section className="mt-8">

@@ -50,7 +50,7 @@ SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 SUPABASE_SECRET_KEY=YOUR_SUPABASE_SECRET_KEY
 
 FIMIPAY_API_KEY=YOUR_LIVE_SECRET_KEY
-FIMIPAY_AMOUNT=12000
+FIMIPAY_AMOUNT=16000
 FIMIPAY_CURRENCY=TZS
 ```
 
@@ -64,7 +64,7 @@ FIMIPAY_ORDER_STATUS_URL=https://fimipay.com/api/v1/payment/order_status
 Optional frontend amount:
 
 ```env
-VITE_ACTIVATION_FEE=12000
+VITE_ACTIVATION_FEE=16000
 ```
 
 ### Important
@@ -78,7 +78,7 @@ For Vercel, add the variables to the TALKSWAHILI project under Settings → Envi
 Automatic:
 
 - FimiPay
-- Amount: TZS 12,000
+- Amount: TZS 16,000
 - Currency: TZS
 - Create-order endpoint: `/api/v1/payment/create_order`
 - Order-status endpoint: `/api/v1/payment/order_status`
@@ -87,7 +87,7 @@ Manual/Lipa Namba:
 
 - Lipa Namba: `251226427`
 - Jina: `INNOCENT EDWARD`
-- Amount: TZS 12,000
+- Amount: TZS 16,000
 
 ## 4. Admin
 

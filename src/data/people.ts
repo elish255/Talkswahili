@@ -7,6 +7,7 @@ export type Person = {
   duration: string;
   pay: string;
   avatar: string;
+  topic: string;
 };
 
 const names: Array<[string, string, string]> = [
@@ -72,6 +73,8 @@ const plans: Array<[string, string]> = [
 ];
 const onlinePattern = [true, true, false, true, true];
 
+const TOPICS = ["Travel in Sweden & East Africa", "Berlin food and weekend trips", "French art, books and photography", "Football, London and travel", "Norwegian nature and hiking", "Spanish food and football", "Canadian winter and music", "Irish culture and city life", "Italian cooking and family traditions", "Dutch cycling and technology", "Australian beaches and wildlife", "Vienna music and history", "Polish cities and local food", "American movies and technology", "Danish design and simple living", "Swiss mountains and watches", "Belgian chocolate and travel", "Scottish music and festivals", "Finnish saunas and nature", "Portuguese beaches and football", "Greek islands and history", "Czech cafes and architecture", "Baltic travel and photography", "Luxembourg city life and business", "New Zealand hiking and nature", "Iceland weather and northern lights", "Croatian coast and food", "Welsh music and countryside", "Budapest travel and culture", "Slovak food and mountains", "Latvian cities and art", "Romanian traditions and travel", "Slovenian lakes and hiking", "Alpine life in Liechtenstein", "Malta beaches and history", "Monaco lifestyle and racing", "Cyprus beaches and Mediterranean food", "California technology and movies", "Serbian music and football", "French cinema and travel", "Spanish festivals and food", "Swedish music and winter", "German cars and technology", "Canadian nature and study", "French fashion and culture", "Dutch design and cycling", "Italian cities and coffee", "Irish music and storytelling", "Austrian mountains and skiing", "Norwegian fjords and fishing"];
+
 const LIVE_AVATARS = [
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
   "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=400&q=80",
@@ -114,6 +117,7 @@ export const people: Person[] = names.map(([name, country, flag], i) => ({
   duration: plans[i % plans.length]![0],
   pay: plans[i % plans.length]![1],
   avatar: LIVE_AVATARS[i] ?? `https://i.pravatar.cc/160?img=${(i % 70) + 1}`,
+  topic: TOPICS[i] ?? "Travel, culture and everyday life",
 }));
 
 export const withdrawals = [

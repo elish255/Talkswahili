@@ -17,7 +17,7 @@ export const Route = createFileRoute("/payment")({
 
 const LIPA_NAMBA = "251226427";
 const LIPA_JINA = "INNOCENT EDWARD";
-const PRICE = Number(import.meta.env.VITE_ACTIVATION_FEE || 12000);
+const PRICE = Number(import.meta.env.VITE_ACTIVATION_FEE || 16000);
 type Method = "automatic" | "manual";
 
 type PaymentRow = {
@@ -51,6 +51,9 @@ function PaymentPage() {
       if (!mounted) return;
       if (!data.user) navigate({ to: "/login", search: {} });
       else setUserId(data.user.id);
+    }).catch((error) => {
+      console.error("Payment auth check failed:", error);
+      if (mounted) navigate({ to: "/login", search: {} });
     });
     return () => { mounted = false; };
   }, [navigate]);

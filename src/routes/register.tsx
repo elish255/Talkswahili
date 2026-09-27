@@ -71,7 +71,7 @@ function RegisterPage() {
           <div className="md:col-span-2"><Field label="Country"><select className="k-field focus:k-field-focus" value={form.country} onChange={e => set("country", e.target.value)}>{COUNTRIES.map(([v,l]) => <option key={v} value={v}>{l}</option>)}</select></Field></div>
           <Field label="Password"><div className="relative"><input type={showPass ? "text" : "password"} className="k-field focus:k-field-focus pr-12" placeholder="••••••••" required minLength={6} value={form.password} onChange={e => set("password", e.target.value)} /><button type="button" onClick={() => setShowPass(s => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">{showPass ? "Ficha" : "Onyesha"}</button></div></Field>
           <Field label="Confirm Password"><input type="password" className="k-field focus:k-field-focus" placeholder="••••••••" required value={form.confirm} onChange={e => set("confirm", e.target.value)} /></Field>
-          <div className="md:col-span-2"><button type="submit" disabled={loading} className="k-btn hover:bg-k-indigo-dark disabled:opacity-60">{loading ? "Inasajili..." : "Register"}</button><p className="mt-4 text-center text-sm text-slate-400">Tayari una akaunti? <Link to="/login" className="font-bold text-teal-400">Ingia</Link></p></div>
+          <div className="md:col-span-2"><button type="submit" disabled={loading} className="k-btn hover:bg-k-indigo-dark disabled:opacity-60">{loading ? "Inasajili..." : "Jisajili"}</button><p className="mt-4 text-center text-sm text-slate-400">Tayari una akaunti? <Link to="/login" className="font-bold text-teal-400">Ingia</Link></p></div>
         </form>
       </section>
     </div></div>
