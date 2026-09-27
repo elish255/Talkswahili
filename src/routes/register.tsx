@@ -1,12 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import logo from "@/assets/talkswahili-logo.jpg";
-import { saveLocalUser, getLocalUser } from "@/lib/local-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/register")({
   head: () => ({ meta: [
     { title: "Jisajili — TALKSWAHILI" },
-    { name: "description", content: "Fungua akaunti yako ya TALKSWAHILI kisha lipia kwa USSD Push." },
+    { name: "description", content: "Fungua akaunti ya TALKSWAHILI." },
   ]}),
   component: RegisterPage,
 });
@@ -24,19 +24,31 @@ function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const set = (key: keyof typeof form, value: string) => setForm(f => ({ ...f, [key]: value }));
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault(); setError(null);
     if (form.password.length < 6) return setError("Password iwe na angalau herufi 6.");
     if (form.password !== form.confirm) return setError("Password hazifanani.");
     if (!/^\+?[0-9]{9,15}$/.test(form.phone.replace(/\s/g, ""))) return setError("Namba ya simu si sahihi.");
     setLoading(true);
-    const existing = getLocalUser();
-    saveLocalUser({
-      name: form.name.trim(), username: form.username.trim(), phone: form.phone.trim(), email: form.email.trim(), country: form.country,
-      password: form.password, registeredAt: new Date().toISOString(), paid: existing?.paid ?? false,
-      balance: existing?.balance ?? 0, withdrawn: existing?.withdrawn ?? 0, messageCount: existing?.messageCount ?? 0,
+    const { data, error } = await supabase.auth.signUp({
+      email: form.email.trim(),
+      password: form.password,
+      options: {
+        data: {
+          full_name: form.name.trim(),
+          phone: form.phone.trim(),
+          country: form.country,
+          username: form.username.trim(),
+        },
+      },
     });
-    setLoading(false); navigate({ to: "/payment" });
+    setLoading(false);
+    if (error) return setError(error.message);
+    if (!data.session) {
+      setError("Akaunti imetengenezwa. Fungua email yako kuthibitisha akaunti, kisha ingia.");
+      return;
+    }
+    navigate({ to: "/payment" });
   }
 
   return <main className="flex min-h-screen items-center justify-center bg-[#07151f] px-4 py-10 font-jost text-white">
@@ -44,8 +56,8 @@ function RegisterPage() {
       <aside className="hidden bg-[#0b202c] p-10 text-white lg:col-span-5 lg:flex lg:flex-col">
         <div className="mb-10 inline-flex w-fit rounded-xl bg-white px-3 py-2"><img src={logo} alt="TALKSWAHILI" className="h-8 w-auto object-contain" /></div>
         <h2 className="text-2xl font-bold">Join our community</h2>
-        <p className="mt-3 text-sm text-white/60">Fungua akaunti yako, lipia kwa USSD Push na anza kutumia mfumo mara moja.</p>
-        <div className="mt-10 space-y-3 text-sm">{["Secure Data Encryption", "Instant Account Activation", "Malipo salama kwa simu"].map(t => <div key={t} className="flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-k-indigo text-xs">✓</span><span>{t}</span></div>)}</div>
+        <p className="mt-3 text-sm text-white/60">Fungua akaunti yako, kisha tumia Automatic Push au Lipa Namba.</p>
+        <div className="mt-10 space-y-3 text-sm">{["Secure Data Encryption", "Automatic Account Activation", "Malipo salama kwa simu"].map(t => <div key={t} className="flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-k-indigo text-xs">✓</span><span>{t}</span></div>)}</div>
         <p className="mt-auto pt-10 text-xs text-white/40">© TALKSWAHILI</p>
       </aside>
       <section className="p-6 md:p-10 lg:col-span-7">
@@ -59,7 +71,7 @@ function RegisterPage() {
           <div className="md:col-span-2"><Field label="Country"><select className="k-field focus:k-field-focus" value={form.country} onChange={e => set("country", e.target.value)}>{COUNTRIES.map(([v,l]) => <option key={v} value={v}>{l}</option>)}</select></Field></div>
           <Field label="Password"><div className="relative"><input type={showPass ? "text" : "password"} className="k-field focus:k-field-focus pr-12" placeholder="••••••••" required minLength={6} value={form.password} onChange={e => set("password", e.target.value)} /><button type="button" onClick={() => setShowPass(s => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">{showPass ? "Ficha" : "Onyesha"}</button></div></Field>
           <Field label="Confirm Password"><input type="password" className="k-field focus:k-field-focus" placeholder="••••••••" required value={form.confirm} onChange={e => set("confirm", e.target.value)} /></Field>
-          <div className="md:col-span-2"><button type="submit" disabled={loading} className="k-btn hover:bg-k-indigo-dark disabled:opacity-60">{loading ? "Inasajili..." : "Register"}</button><p className="mt-4 text-center text-sm text-slate-400">Tayari una akaunti? <Link to="/" className="font-bold text-teal-400">Rudi</Link></p></div>
+          <div className="md:col-span-2"><button type="submit" disabled={loading} className="k-btn hover:bg-k-indigo-dark disabled:opacity-60">{loading ? "Inasajili..." : "Register"}</button><p className="mt-4 text-center text-sm text-slate-400">Tayari una akaunti? <Link to="/login" className="font-bold text-teal-400">Ingia</Link></p></div>
         </form>
       </section>
     </div></div>

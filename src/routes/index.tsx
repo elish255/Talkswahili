@@ -16,7 +16,7 @@ import {
 import logo from "@/assets/talkswahili-logo.jpg";
 import { PayoutToasts } from "@/components/PayoutToasts";
 import { people, reviews, withdrawals } from "@/data/people";
-import { getLocalUser } from "@/lib/local-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 const WHATSAPP_NUMBER = "0612820109";
 const WHATSAPP_LINK = "https://wa.me/255612820109";
@@ -130,9 +130,14 @@ function Index() {
     navigate({ to: "/chat", search: { person: name } });
   };
 
-  const registerOrDashboard = () => {
-    const user = getLocalUser();
-    navigate({ to: user?.paid ? "/dashboard" : "/register" });
+  const registerOrDashboard = async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) {
+      navigate({ to: "/register" });
+      return;
+    }
+    const { data: profile } = await supabase.from("profiles").select("activated").eq("id", data.user.id).maybeSingle();
+    navigate({ to: profile?.activated ? "/dashboard" : "/payment" });
   };
 
   return (

@@ -89,7 +89,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "keywords",
         content:
-          "TALKSWAHILI, Talkswahili, Talk Swahili, TALKSWAHILI Live, talkswahililive.site, Kiswahili ni Fursa, chat na wageni, kuchat na wazungu, kazi online Tanzania, kipato online Tanzania, chat Tanzania, voice call, video call, USSD Push, Mobilipa",
+          "TALKSWAHILI, Talkswahili, Talk Swahili, TALKSWAHILI Live, talkswahililive.site, Kiswahili ni Fursa, chat na wageni, kuchat na wazungu, kazi online Tanzania, kipato online Tanzania, chat Tanzania, voice call, video call, USSD Push",
       },
       { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
       { name: "googlebot", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
